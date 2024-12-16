@@ -11,9 +11,9 @@ oracledb.initOracleClient({
 });
 
 // Configuración de Oracle Instant Client (modo Thick)  - Maquina Neto
-oracledb.initOracleClient({
-  libDir: "/Users/cenate2/Datos Cenate/instantclient_23_3",
-});
+//oracledb.initOracleClient({
+// libDir: "/Users/cenate2/Datos Cenate/instantclient_23_3",
+//});
 
 // Configuración de conexión
 const config = {
@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Ruta para servir el archivo HTML (desde la carpeta 'public')
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "datos_ti_users.html"));
+  res.sendFile(path.join(__dirname, "public", "users_ti.html"));
 });
 
 // Ruta para obtener los datos de la base de datos como JSON
