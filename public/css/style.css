@@ -1,156 +1,296 @@
 /* Variables de colores */
 :root {
-    --first-color: #7fb6d4;
-    --white: white;
-    --first-color-light: #cecdcd;
-    --title-color: #19181b;
-    --text-color: #020202;
-    --text-color-light: #b2d1ee;
-    --body-color: #dfdbdf;
-    --text-color-cenate: #2b75b2;
-    --titulo: #1b476c;
-    --container-color: #faf9f9;
-    --color-main-contrast: #333;
-    --color-hover: #f5f5f5;
-    --color-border-card: #ccc;
+  --first-color: #7fb6d4;
+  --white: white;
+  --verdepersonalizado: rgb(38, 110, 38);
+  --first-color-light: #cecdcd;
+  --title-color: #19181b;
+  --text-color: #020202;
+  --text-color-light: #b2d1ee;
+  --body-color: #dfdbdf;
+  --text-color-cenate: #2b75b2;
+  --titulo: #1b476c;
+  --container-color: #faf9f9;
+  --color-main-contrast: #333;
+  --color-hover: #f5f5f5;
+  --color-border-card: #ccc;
 
-    /* Fuentes */
-    --body-font: "Poppins", sans-serif;
-    --normal-font-size: 0.998rem;
-    --small-font-size: 0.95rem;
-    --smaller-font-size: 0.85rem;
-    --font-medium: 500;
-    --font-semi-bold: 600;
-    --z-fixed: 100;
-    --black-light-color: #070707;
-    --border-color: #e6e5e5;
-    --toggle-color: #aca6a6;
-    --box1-color: #4da3ff;
-    --box2-color: #ffe6ac;
-    --box3-color: #e7d1fc;
-    --title-icon-color: #fff;
-    --tran-05: all 0.5s ease;
-    --tran-03: all 0.3s ease;
+  /* Fuentes */
+  --body-font: "Poppins", sans-serif;
+  --normal-font-size: 0.998rem;
+  --small-font-size: 0.95rem;
+  --smaller-font-size: 0.85rem;
+  --font-medium: 500;
+  --font-semi-bold: 600;
+  --z-fixed: 100;
+  --black-light-color: #070707;
+  --border-color: #e6e5e5;
+  --toggle-color: #aca6a6;
+  --box1-color: #4da3ff;
+  --box2-color: #ffe6ac;
+  --box3-color: #e7d1fc;
+  --title-icon-color: #fff;
+  --tran-05: all 0.5s ease;
+  --tran-03: all 0.3s ease;
 }
 
 /* Formateo de la página */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-html, body {
-    height: 100%; /* Asegura que el body ocupe toda la altura de la ventana */
-    margin: 0;
-    padding: 0;
-    font-family: var(--body-font);
-    font-size: var(--normal-font-size);
-    background: linear-gradient(to bottom, var(--first-color), var(--white));
-    color: var(--text-color);
+html,
+body {
+  height: 100%; /* Asegura que el body ocupe toda la altura de la ventana */
+  margin: 0;
+  padding: 0;
+  font-family: var(--body-font);
+  font-size: var(--normal-font-size);
+  background: linear-gradient(to bottom, var(--first-color), var(--white));
+  color: var(--text-color);
 }
 
 body {
-    display: flex; /* Usar flexbox para que el contenido se distribuya adecuadamente */
-    flex-direction: column;
-    min-height: 100%; /* Esto asegura que el body ocupe al menos toda la altura de la ventana */
+  display: flex; /* Usar flexbox para que el contenido se distribuya adecuadamente */
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
+/* Título */
+.titulo {
+  color: var(--titulo); /* Color del texto */
+  font-weight: bold; /* Negrita */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil para el texto */
+  margin: 40px;
+}
 
 /* Contenedor de la tabla centrado */
 .table-container {
-    padding: 20px;
-    margin: 0 auto; /* Centrado automático */
-    width: 90%; /* Ajusta el contenedor a un 90% del ancho de la pantalla */
-    max-width: 1700px; /* Limita el ancho máximo del contenedor */
-    box-sizing: border-box;
-    overflow-x: auto; /* Permite el desplazamiento horizontal si es necesario */
+  padding: 20px;
+  margin: 0 auto; /* Centrado automático */
+  width: 90%; /* Ajusta el contenedor a un 90% del ancho de la pantalla */
+  max-width: 1700px; /* Limita el ancho máximo del contenedor */
+  box-sizing: border-box;
+  overflow-x: auto; /* Permite el desplazamiento horizontal si es necesario */
 }
-
-.titulo {
-    color: var(--titulo); /* Color del texto */
-    font-weight: bold; /* Negrita */
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil para el texto */
-}
-
 
 /* Estilo del título */
 h1 {
-    font-size: 2.5rem;
-    color: var(--title-color);
-    margin-bottom: 30px; /* Añade margen inferior para separarlo de la tabla */
-    text-align: center;
-    font-weight: var(--font-semi-bold);
+  font-size: 2.5rem;
+  color: var(--title-color);
+  margin-bottom: 30px; /* Añade margen inferior para separarlo de la tabla */
+  text-align: center;
+  font-weight: var(--font-semi-bold);
 }
 
 /* Estilo de la tabla */
 #data-table {
-    width: 100%; /* La tabla ocupa todo el contenedor disponible */
-    max-width: 100%; /* Asegura que la tabla no crezca más allá del contenedor */
-    border-collapse: collapse;
-    font-size: 16px;
-    background-color: var(--white);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    margin: 0 auto; /* Centrado automático */
-    table-layout: auto; /* Asegura que las celdas no se estiren innecesariamente */
+  width: 100%; /* La tabla ocupa todo el contenedor disponible */
+  max-width: 100%; /* Asegura que la tabla no crezca más allá del contenedor */
+  border-collapse: collapse;
+  font-size: 16px;
+  background-color: var(--white);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 0 auto; /* Centrado automático */
+  table-layout: auto; /* Asegura que las celdas no se estiren innecesariamente */
 }
 
 /* Estilo de las celdas de la cabecera */
 #data-table th {
-    background-color: var(--box1-color);
-    color: var(--white);
-    padding: 12px 15px;
-    text-align: center;
-    font-weight: bold;
-    border: 1px solid var(--border-color);
+  background-color: var(--box1-color);
+  color: var(--white);
+  padding: 12px 15px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid var(--border-color);
 }
 
 /* Estilo de las celdas de la tabla */
 #data-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
+  padding: 12px 15px;
+  text-align: left;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
 }
 
 /* Filas alternas con fondo suave */
 #data-table tr:nth-child(even) {
-    background-color: var(--first-color-light);
+  background-color: var(--first-color-light);
 }
 
 /* Efecto hover en las filas */
 #data-table tr:hover {
-    background-color: var(--color-hover);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: var(--color-hover);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 600px;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-top: 40px;
+}
+
+/* Título del formulario */
+h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Estilos de los campos del formulario */
+form .form-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 5px;
+}
+
+form .form-control {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+form .form-control:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Espaciado entre los campos */
+form .mb-3 {
+  margin-bottom: 15px;
+}
+
+/* Estilo del botón Modificar */
+/* Estilo para el botón azul */
+.btn-blue {
+  display: inline-block;
+  padding: 12px 24px; /* Aumentamos el tamaño del padding para hacerlo más grande */
+  background-color: var(--box1-color); /* Color azul personalizado */
+  color: var(--white);
+  border-radius: 30px; /* Redondeamos un poco más el borde */
+  font-size: 1.1rem; /* Aumentamos el tamaño de la fuente */
+  font-weight: bold; /* Hacemos el texto en negrita */
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease; /* Transición suave para todos los efectos */
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  cursor: pointer; /* Cambiamos el cursor a mano */
+}
+
+/* Efectos al pasar el mouse sobre el botón azul */
+.btn-blue:hover {
+  background-color: #0056b3; /* Cambio de color en hover */
+  transform: translateY(-2px); /* Levitamos el botón ligeramente */
+  color: var(--body-color);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra más intensa en hover */
+}
+
+/* Efecto al hacer clic en el botón azul */
+.btn-blue:active {
+  background-color: #004085; /* Color de fondo más oscuro al hacer clic */
+  transform: translateY(2px); /* Lo hundimos ligeramente */
+  color: var(--body-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra más sutil en clic */
+}
+/* Estilo para el contenedor de los botones */
+.btn-container {
+  display: flex; /* Usamos Flexbox para alinear los botones */
+  gap: 20px; /* Espacio entre los botones */
+  justify-content: center; /* Centrar los botones en el contenedor */
+  margin-top: 20px; /* Espacio superior para separación */
+}
+
+/* Estilo para el botón verde */
+.btn-green {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: var(
+    --verdepersonalizado,
+    #28a745
+  ); /* Verde personalizado */
+  color: var(--white, #ffffff);
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Efectos al pasar el mouse sobre el botón verde */
+.btn-green:hover {
+  background-color: #4caf50;
+  transform: translateY(-2px);
+  color: var(--body-color, #333);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Efecto al hacer clic en el botón verde */
+.btn-green:active {
+  background-color: #388e3c;
+  transform: translateY(2px);
+  color: var(--body-color, #333);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+/* Responsive: Adaptación para pantallas pequeñas */
+@media (max-width: 576px) {
+  .container {
+    padding: 20px;
+  }
+
+  form .form-control {
+    font-size: 0.95rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
 }
 
 /* Estilos para pantallas pequeñas */
 @media screen and (max-width: 768px) {
-    #data-table th, #data-table td {
-        padding: 10px;
-        font-size: 14px;
-    }
+  #data-table th,
+  #data-table td {
+    padding: 10px;
+    font-size: 14px;
+  }
 
-    h1 {
-        font-size: 2rem;
-    }
+  h1 {
+    font-size: 2rem;
+  }
 }
 
 /* Ajustes para pantallas pequeñas (móviles) */
 @media screen and (max-width: 480px) {
-    #data-table th, #data-table td {
-        padding: 8px;
-        font-size: 12px;
-    }
+  #data-table th,
+  #data-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
 
-    h1 {
-        font-size: 1.8rem;
-    }
-}
-
-/* Ajustes generales para pantallas grandes */
-@media screen and (min-width: 768px) {
-    body {
-        padding: 1rem 3rem 0 6rem;
-    }
+  h1 {
+    font-size: 1.8rem;
+  }
 }
