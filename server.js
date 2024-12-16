@@ -5,9 +5,14 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
-// Configuración de Oracle Instant Client (modo Thick)
+// Configuración de Oracle Instant Client (modo Thick) - Maquina Styp
 oracledb.initOracleClient({
   libDir: "/Users/styp/Downloads/instantclient_23_3",
+});
+
+// Configuración de Oracle Instant Client (modo Thick)  - Maquina Neto
+oracledb.initOracleClient({
+  libDir: "/Users/cenate2/Datos Cenate/instantclient_23_3",
 });
 
 // Configuración de conexión
