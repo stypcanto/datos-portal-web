@@ -20,7 +20,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta para servir el archivo HTML (desde la carpeta 'public')
 app.get('/', (req, res) => {
-  // Esto sirve el archivo 'datos_ti_users.html' desde la carpeta 'public'
   res.sendFile(path.join(__dirname, 'public', 'datos_ti_users.html'));
 });
 
@@ -28,15 +27,34 @@ app.get('/', (req, res) => {
 app.get('/data', async (req, res) => {
   let connection;
   try {
-    // Conectarse a la base de datos
     connection = await oracledb.getConnection(config);
+    // Realizar la consulta con el orden de columnas especificado
+    const result = await connection.execute(`
+      SELECT 
+        ID_SOPORTE_TI, 
+        NOMBRES_SOPORTE_TI, 
+        APEPATERNO_SOPORTE_TI, 
+        APEMATERNO_SOPORTE_TI, 
+        DNI_SOPORTE_TI, 
+        CORREO_SOPORTE_TI
+      FROM CENATE_SOPORTE_TI
+    `);
 
-    // Realizar la consulta
-    const result = await connection.execute('SELECT * FROM CENATE_SOPORTE_TI');
+    // Verifica los resultados en la consola para confirmar que los datos están correctos
+    console.log(result.rows); // Agrega un log para ver la estructura de los datos
 
-    // Enviar los datos como JSON
+    // Enviar los datos como JSON con los encabezados personalizados
+    const headers = [
+      'ID',
+      'Nombres',
+      'Apellido Paterno',
+      'Apellido Materno',
+      'DNI',
+      'Correo Electrónico'
+    ];
+
     res.json({
-      columns: result.metaData.map(col => col.name),
+      columns: headers,
       rows: result.rows
     });
 
@@ -45,7 +63,6 @@ app.get('/data', async (req, res) => {
     res.status(500).send('Error en la base de datos');
   } finally {
     if (connection) {
-      // Cerrar la conexión
       await connection.close();
     }
   }
