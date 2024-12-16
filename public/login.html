@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="css/style_login.css" />
+    <!-- Asegúrate de enlazar tu archivo CSS -->
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-form">
+        <h2 class="login-title">Iniciar sesión</h2>
+
+        <form action="/login" method="POST">
+          <div class="input-group">
+            <label for="usuario">Usuario</label>
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              placeholder="Ingresa tu usuario"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="contrasena">Contraseña</label>
+            <input
+              type="password"
+              id="contrasena"
+              name="contrasena"
+              placeholder="Ingresa tu contraseña"
+              required
+            />
+          </div>
+
+          <div class="btn-container">
+            <button type="submit" class="btn-submit">Iniciar sesión</button>
+          </div>
+
+          <p class="signup-link">
+            ¿No tienes cuenta? <a href="/register">Crear cuenta</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
