@@ -24,11 +24,11 @@
             <input type="text" class="form-control" id="id" disabled />
           </div>
           <div class="mb-3">
-            <label for="nombre" class="form-label">Nombres</label>
+            <label for="nombres" class="form-label">Nombres</label>
             <input
               type="text"
               class="form-control uppercase"
-              id="nombre"
+              id="nombres"
               required
               oninput="this.value = this.value.toUpperCase()"
             />
@@ -141,52 +141,53 @@
         loadData();
 
         // Manejo de eventos para el formulario (crear y actualizar)
-        $("#crud-form").on("submit", function (event) {
-          event.preventDefault();
+     // Manejo de eventos para el formulario (crear y actualizar)
+$("#crud-form").on("submit", function (event) {
+  event.preventDefault();
 
-          const id = $("#id").val(); // Se toma el ID solo si estamos actualizando
-          const nombre = $("#nombre").val();
-          const apellidoPaterno = $("#apellidoPaterno").val();
-          const apellidoMaterno = $("#apellidoMaterno").val();
-          const dni = $("#dni").val();
-          const correo = $("#correo").val();
+  const id = $("#id").val(); // Se toma el ID solo si estamos actualizando
+  const nombres = $("#nombres").val(); // Cambié esto de 'nombre' a 'nombres'
+  const apellidoPaterno = $("#apellidoPaterno").val();
+  const apellidoMaterno = $("#apellidoMaterno").val();
+  const dni = $("#dni").val();
+  const correo = $("#correo").val();
 
-          // Determinamos si es una actualización o una creación
-          const method = $("#submit-btn").data("id") ? "PUT" : "POST";
-          const url = method === "PUT" ? `${apiUrl}/${id}` : apiUrl;
+  // Determinamos si es una actualización o una creación
+  const method = $("#submit-btn").data("id") ? "PUT" : "POST";
+  const url = method === "PUT" ? `${apiUrl}/${id}` : apiUrl;
 
-          // No enviar el ID al crear un nuevo registro
-          const data =
-            method === "POST"
-              ? { nombre, apellidoPaterno, apellidoMaterno, dni, correo }
-              : { id, nombre, apellidoPaterno, apellidoMaterno, dni, correo };
+  // No enviar el ID al crear un nuevo registro
+  const data =
+    method === "POST"
+      ? { nombres, apellidoPaterno, apellidoMaterno, dni, correo }
+      : { id, nombres, apellidoPaterno, apellidoMaterno, dni, correo };
 
-          $.ajax({
-            url: url,
-            type: method,
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            success: function (response) {
-              alert("Operación exitosa");
-              loadData(); // Recargar los datos después de la operación
-              $("#crud-form")[0].reset(); // Limpiar el formulario
-              $("#submit-btn").data("id", "").text("Crear"); // Resetear el botón
-              $("#form-title").text("Nuevo Registro");
+  $.ajax({
+    url: url,
+    type: method,
+    data: JSON.stringify(data),
+    contentType: "application/json",
+    success: function (response) {
+      alert("Operación exitosa");
+      loadData(); // Recargar los datos después de la operación
+      $("#crud-form")[0].reset(); // Limpiar el formulario
+      $("#submit-btn").data("id", "").text("Crear"); // Resetear el botón
+      $("#form-title").text("Nuevo Registro");
 
-              // Redirigir a la página 'users_ti.html'
-              window.location.href = "users_ti.html";
-            },
-            error: function (err) {
-              alert("Error al procesar la solicitud");
-            },
-          });
-        });
+      // Redirigir a la página 'users_ti.html'
+      window.location.href = "users_ti.html";
+    },
+    error: function (err) {
+      alert("Error al procesar la solicitud");
+    },
+  });
+});
 
         // Editar un registro
         $("#data-table").on("click", ".edit-btn", function () {
           const row = $(this).closest("tr");
           const id = row.data("id");
-          const nombre = row.find("td").eq(1).text();
+          const nombres = row.find("td").eq(1).text();
           const apellidoPaterno = row.find("td").eq(2).text();
           const apellidoMaterno = row.find("td").eq(3).text();
           const dni = row.find("td").eq(4).text();
@@ -194,7 +195,7 @@
 
           // Poner los valores en el formulario de edición
           $("#id").val(id);
-          $("#nombre").val(nombre);
+          $("#nombres").val(nombres);
           $("#apellidoPaterno").val(apellidoPaterno);
           $("#apellidoMaterno").val(apellidoMaterno);
           $("#dni").val(dni);
