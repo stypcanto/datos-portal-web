@@ -1,0 +1,174 @@
+/* Colores y fuentes */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --white: #fff;
+  --border-color: #ddd;
+  --hover-bg: #f8f9fa;
+  --active-bg: #e9ecef;
+  --table-bg: #f4f4f4;
+  --table-header-bg: #546980;
+  --table-header-color: #fff;
+  --font-family: 'Roboto', sans-serif;
+  --first-color: #7fb6d4;
+  --white: white;
+  --verdepersonalizado: rgb(38, 110, 38);
+  --first-color-light: #cecdcd;
+  --title-color: #19181b;
+  --text-color: #020202;
+  --text-color-light: #b2d1ee;
+  --body-color: #dfdbdf;
+  --text-color-cenate: #2b75b2;
+  --titulo: #1b476c;
+  --container-color: #faf9f9;
+  --color-main-contrast: #333;
+  --color-hover: #f5f5f5;
+  --color-border-card: #ccc;
+
+}
+
+/* Global styles */
+body {
+  font-family: var(--font-family);
+  background-color: var(--titulo);
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contenedor */
+.container {
+  width: 90%;
+  max-width: 1700px;
+  margin: -40px auto 20px; /* Ajuste negativo para conectar el header con el container */
+  padding: 20px;
+  background-color: var(--white);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  z-index: 1; /* Asegura que el container esté detrás de los logos */
+  position: relative;
+}
+
+/* Título */
+.titulo {
+  color: var(--titulo);
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  margin: 0 auto;
+  text-align: center; /* Asegura el centrado del texto */
+  position: relative; /* Permite ajustes si es necesario con 'top' o 'left' */
+}
+
+/* Encabezado con fondo azul */
+.header {
+  background-color: var(--titulo);
+  position: relative;
+  text-align: center;
+  padding: 70px 0 70px; /* Espaciado para separar del container */
+  color: var(--white);
+}
+
+/* Logos */
+.logo-left, .logo-right {
+  position: absolute;
+  top: 20px;
+  width: 160px; /* Tamaño del logo */
+}
+
+.logo-left {
+  left: 20px;
+}
+
+.logo-right {
+  right: 20px;
+}
+
+.logo-left img, .logo-right img {
+  width: 100%;
+  height: auto;
+}
+
+/* Table styles */
+#data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#data-table th,
+#data-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+}
+
+/* Table header */
+#data-table th {
+  background-color: var(--table-header-bg);
+  color: var(--table-header-color);
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Table row hover effect */
+#data-table tr:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Alternating row colors */
+#data-table tr:nth-child(even) {
+  background-color: var(--table-bg);
+}
+
+/* Loading spinner */
+#loading-spinner {
+  display: none;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.spinner-border {
+  width: 50px;
+  height: 50px;
+  border-width: 5px;
+  border-color: var(--primary-color) transparent transparent transparent;
+}
+
+/* Button styles */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: 20px;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  background-color: #003d7a;
+  transform: translateY(2px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  #data-table th, #data-table td {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+  }
+}

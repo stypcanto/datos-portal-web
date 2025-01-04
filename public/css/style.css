@@ -66,9 +66,9 @@ body {
 
 /* Contenedor de la tabla centrado */
 .table-container {
-  padding: 20px;
+ padding: 20px;
   margin: 0 auto; /* Centrado automático */
-  width: 90%; /* Ajusta el contenedor a un 90% del ancho de la pantalla */
+  width: 100%; /* Ajusta el contenedor a un 90% del ancho de la pantalla */
   max-width: 1700px; /* Limita el ancho máximo del contenedor */
   box-sizing: border-box;
   overflow-x: auto; /* Permite el desplazamiento horizontal si es necesario */
@@ -128,9 +128,9 @@ h1 {
 
 /* Contenedor principal */
 .container {
-  max-width: 600px;
+  max-width: 1024px;
   background-color: #ffffff;
-  padding: 30px;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;

@@ -34,12 +34,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Ruta para servir el archivo HTML
+
+// Ruta para servir la página de soporte TI
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "users_ti.html"));
 });
 
-// Ruta para obtener datos
+// Ruta para obtener datos de la tabla CENATE_SOPORTE_TI
 app.get("/data", async (req, res) => {
   let connection;
   try {
@@ -74,6 +75,62 @@ app.get("/data", async (req, res) => {
   }
 });
 
+
+// Nueva ruta para obtener datos de la tabla CENATE_PERSONAL_2025
+app.get("/personal_cenate", async (req, res) => {
+  let connection;
+  let sql = `
+    SELECT 
+      ID_PERSONAL, 
+      NOMBRES_PERSONAL, 
+      APEPATERNO_PERSONAL, 
+      APEMATERNO_PERSONAL, 
+      AREA_LABORAL_PERSONAL, 
+      DNI_PERSONAL, 
+      CORREO_PERSONAL, 
+      NUM_TELEFONO_PERSONAL, 
+      SEXO_PERSONAL, 
+      COD_ESTADO_CONTRATO 
+    FROM CENATE_PERSONAL_2025
+  `;
+
+  let bindParams = {};
+
+  // Filtrar si se pasa un DNI
+  if (req.query.dni) {
+    const dni = req.query.dni;
+    sql += " WHERE DNI_PERSONAL = :dni";
+    bindParams.dni = dni;
+  }
+
+  try {
+    connection = await oracledb.getConnection(config);
+    const result = await connection.execute(sql, bindParams);
+
+    const headers = [
+      "ID",
+      "Nombres",
+      "Apellido Paterno",
+      "Apellido Materno",
+      "Área Laboral",
+      "DNI",
+      "Correo Electrónico",
+      "Teléfono",
+      "Sexo",
+      "Estado del Contrato",
+    ];
+
+    res.json({ columns: headers, rows: result.rows });
+  } catch (err) {
+    console.error("Error en la conexión o consulta:", err);
+    res.status(500).send("Error en la base de datos");
+  } finally {
+    if (connection) await connection.close();
+  }
+});
+
+
+// Ruta para modificar la página de soporte TI
 // Ruta para crear un nuevo registro
 app.post("/data", async (req, res) => {
   let connection;
