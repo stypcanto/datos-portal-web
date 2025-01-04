@@ -35,6 +35,10 @@ app.use((req, res, next) => {
 });
 
 
+// Declarar la conexión fuera del bloque try-catch
+let connection;
+
+
 // Ruta para servir la página de soporte TI
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "users_ti.html"));
@@ -235,6 +239,7 @@ app.delete("/data/:id", async (req, res) => {
 
 // CRUD para modificar datos del personal
 // Crear un nuevo registro
+// Crear un nuevo registro
 app.post("/personal_cenate", async (req, res) => {
   let connection;
   try {
@@ -250,12 +255,33 @@ app.post("/personal_cenate", async (req, res) => {
       estadoContrato,
     } = req.body;
 
-    if (!nombres || !dni) {
-      return res.status(400).send("Datos incompletos");
+    // Validación de datos de entrada
+    if (!nombres || !apellidoPaterno || !dni || !correo || !telefono || !sexo || !estadoContrato) {
+      return res.status(400).send({ error: "Todos los campos son obligatorios excepto el apellido materno y área laboral" });
     }
 
+    // Validación adicional de formato (si es necesario)
+    const dniRegex = /^\d{8}$/;  // Suponiendo que el DNI es un número de 8 dígitos
+    if (!dniRegex.test(dni)) {
+      return res.status(400).send({ error: "El DNI debe ser un número de 8 dígitos" });
+    }
+
+    // Conexión a la base de datos
     connection = await oracledb.getConnection(config);
 
+    // Verificar si el DNI ya existe
+    const result = await connection.execute(
+      'SELECT COUNT(*) FROM CENATE_PERSONAL_2025 WHERE DNI_PERSONAL = :dni',
+      { dni }
+    );
+
+    const exists = result.rows[0][0] > 0;
+
+    if (exists) {
+      return res.status(400).send({ error: "El DNI ya está registrado" });
+    }
+
+    // Insertar el nuevo registro si el DNI no existe
     await connection.execute(
       `
       INSERT INTO CENATE_PERSONAL_2025 
@@ -266,15 +292,30 @@ app.post("/personal_cenate", async (req, res) => {
       { autoCommit: true }
     );
     
-
-    res.status(201).send("Registro creado correctamente");
+    // Respuesta exitosa
+    res.status(201).send({ message: "Registro creado correctamente" });
   } catch (err) {
     console.error("Error al crear el registro:", err);
-    res.status(500).send("Error al procesar la solicitud");
+
+    // Manejo de errores específicos de la base de datos
+    if (err.message.includes("ORA-00001")) {
+      return res.status(400).send({ error: "El DNI ya está registrado" });
+    }
+
+    // Respuesta genérica para otros errores
+    res.status(500).send({ error: "Error al procesar la solicitud. Intenta nuevamente más tarde." });
   } finally {
-    if (connection) await connection.close();
+    // Asegurarse de cerrar la conexión
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeErr) {
+        console.error("Error al cerrar la conexión:", closeErr);
+      }
+    }
   }
 });
+
 
 // Actualizar un registro por ID
 app.put("/personal_cenate/:id", async (req, res) => {
@@ -356,6 +397,9 @@ app.delete("/personal_cenate/:id", async (req, res) => {
     if (connection) await connection.close();
   }
 });
+
+
+
 
 
 
