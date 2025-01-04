@@ -44,6 +44,9 @@
       
       <!-- Botón para exportar a Excel -->
       <button id="export-btn" class="btn">Exportar a Excel</button>
+
+       <!-- Botón para editar -->
+       <button id="editar-btn" class="btn">Editar Datos</button>
     </div>
 
     <script>
@@ -81,6 +84,15 @@
           spinner.style.display = "none";
         }
       }
+
+
+ // Función para redirigir a la página de edición
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("editar-btn").addEventListener("click", () => {
+         window.location.href = "/modified_personal_cenate.html";
+       });
+  });
+
 
       document.getElementById("export-btn").addEventListener("click", () => {
         const wb = XLSX.utils.book_new();

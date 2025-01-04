@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Personal CENATE</title>
+    <link rel="stylesheet" href="./css/style2.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2 class="text-center">Gestión de Personal CENATE</h2>
+
+      <!-- Formulario para agregar o actualizar -->
+      <div id="form-container">
+        <h3 id="form-title">Nuevo Registro</h3>
+        <form id="crud-form">
+          <div class="mb-3">
+            <label for="id" class="form-label">ID</label>
+            <input type="text" class="form-control" id="id" disabled />
+          </div>
+          <div class="mb-3">
+            <label for="nombres" class="form-label">Nombres</label>
+            <input type="text" class="form-control uppercase" id="nombres" required />
+          </div>
+          <div class="mb-3">
+            <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+            <input type="text" class="form-control uppercase" id="apellidoPaterno" required />
+          </div>
+          <div class="mb-3">
+            <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+            <input type="text" class="form-control uppercase" id="apellidoMaterno" required />
+          </div>
+          <div class="mb-3">
+            <label for="areaLaboral" class="form-label">Área Laboral</label>
+            <input type="text" class="form-control uppercase" id="areaLaboral" required />
+          </div>
+          <div class="mb-3">
+            <label for="dni" class="form-label">DNI</label>
+            <input type="text" class="form-control" id="dni" required />
+          </div>
+          <div class="mb-3">
+            <label for="correo" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="correo" required />
+          </div>
+          <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" required />
+          </div>
+          <div class="mb-3">
+            <label for="sexo" class="form-label">Sexo</label>
+            <select id="sexo" class="form-control" required>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="estadoContrato" class="form-label">Estado del Contrato</label>
+            <input type="text" class="form-control uppercase" id="estadoContrato" required />
+          </div>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+        </form>
+      </div>
+
+      <hr />
+
+      <!-- Tabla para mostrar los datos -->
+      <h3>Lista de Registros</h3>
+      <table class="table" id="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombres</th>
+            <th>Apellido Paterno</th>
+            <th>Apellido Materno</th>
+            <th>Área Laboral</th>
+            <th>DNI</th>
+            <th>Correo Electrónico</th>
+            <th>Teléfono</th>
+            <th>Sexo</th>
+            <th>Estado del Contrato</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los registros se cargarán aquí dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        const apiUrl = "/personal_cenate";
+
+        // Función para cargar los datos
+  // Función para cargar los datos
+function loadData() {
+  $.get(apiUrl, function (data) {
+    const rows = data.rows || []; // Asegúrate de que 'rows' esté definido
+    const tableBody = $("#data-table tbody");
+    tableBody.empty();
+
+    rows.forEach(function (row) {
+      const [id, nombres, apellidoPaterno, apellidoMaterno, areaLaboral, dni, correo, telefono, sexo, estadoContrato] = row;
+
+      tableBody.append(`
+        <tr data-id="${id}">
+          <td>${id}</td>
+          <td>${nombres}</td>
+          <td>${apellidoPaterno}</td>
+          <td>${apellidoMaterno}</td>
+          <td>${areaLaboral}</td>
+          <td>${dni}</td>
+          <td>${correo}</td>
+          <td>${telefono}</td>
+          <td>${sexo}</td>
+          <td>${estadoContrato}</td>
+          <td>
+            <button class="btn btn-warning btn-sm edit-btn">Editar</button>
+            <button class="btn btn-danger btn-sm delete-btn">Eliminar</button>
+          </td>
+        </tr>
+      `);
+    });
+  }).fail(function() {
+    alert('Error al cargar los datos');
+  });
+}
+
+
+        loadData();
+
+        // Crear o actualizar
+        $("#crud-form").on("submit", function (event) {
+          event.preventDefault();
+
+          const id = $("#id").val();
+          const nombres = $("#nombres").val();
+          const apellidoPaterno = $("#apellidoPaterno").val();
+          const apellidoMaterno = $("#apellidoMaterno").val();
+          const areaLaboral = $("#areaLaboral").val();
+          const dni = $("#dni").val();
+          const correo = $("#correo").val();
+          const telefono = $("#telefono").val();
+          const sexo = $("#sexo").val();
+          const estadoContrato = $("#estadoContrato").val();
+
+          const method = id ? "PUT" : "POST";
+          const url = id ? `${apiUrl}/${id}` : apiUrl;
+
+          const data = { nombres, apellidoPaterno, apellidoMaterno, areaLaboral, dni, correo, telefono, sexo, estadoContrato };
+
+          $.ajax({
+            url,
+            type: method,
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function () {
+              alert("Operación exitosa");
+              loadData();
+              $("#crud-form")[0].reset();
+              $("#submit-btn").text("Crear");
+              $("#form-title").text("Nuevo Registro");
+            },
+          });
+        });
+
+        // Editar
+        $("#data-table").on("click", ".edit-btn", function () {
+          const row = $(this).closest("tr");
+          $("#id").val(row.data("id"));
+          $("#nombres").val(row.find("td").eq(1).text());
+          $("#apellidoPaterno").val(row.find("td").eq(2).text());
+          $("#apellidoMaterno").val(row.find("td").eq(3).text());
+          $("#areaLaboral").val(row.find("td").eq(4).text());
+          $("#dni").val(row.find("td").eq(5).text());
+          $("#correo").val(row.find("td").eq(6).text());
+          $("#telefono").val(row.find("td").eq(7).text());
+          $("#sexo").val(row.find("td").eq(8).text());
+          $("#estadoContrato").val(row.find("td").eq(9).text());
+
+          $("#submit-btn").text("Actualizar");
+          $("#form-title").text("Actualizar Registro");
+        });
+
+        // Eliminar
+        $("#data-table").on("click", ".delete-btn", function () {
+          const id = $(this).closest("tr").data("id");
+          if (confirm("¿Estás seguro de eliminar este registro?")) {
+            $.ajax({
+              url: `${apiUrl}/${id}`,
+              type: "DELETE",
+              success: function () {
+                alert("Registro eliminado");
+                loadData();
+              },
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

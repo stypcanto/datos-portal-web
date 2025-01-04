@@ -229,6 +229,136 @@ app.delete("/data/:id", async (req, res) => {
   }
 });
 
+
+
+
+
+// CRUD para modificar datos del personal
+// Crear un nuevo registro
+app.post("/personal_cenate", async (req, res) => {
+  let connection;
+  try {
+    const {
+      nombres,
+      apellidoPaterno,
+      apellidoMaterno,
+      areaLaboral,
+      dni,
+      correo,
+      telefono,
+      sexo,
+      estadoContrato,
+    } = req.body;
+
+    if (!nombres || !dni) {
+      return res.status(400).send("Datos incompletos");
+    }
+
+    connection = await oracledb.getConnection(config);
+
+    await connection.execute(
+      `
+      INSERT INTO CENATE_PERSONAL_2025 
+      (ID_PERSONAL, NOMBRES_PERSONAL, APEPATERNO_PERSONAL, APEMATERNO_PERSONAL, AREA_LABORAL_PERSONAL, DNI_PERSONAL, CORREO_PERSONAL, NUM_TELEFONO_PERSONAL, SEXO_PERSONAL, COD_ESTADO_CONTRATO) 
+      VALUES (CENATE.CENATE_PERSONAL_SEQ.NEXTVAL, :nombres, :apellidoPaterno, :apellidoMaterno, :areaLaboral, :dni, :correo, :telefono, :sexo, :estadoContrato)
+    `,
+      { nombres, apellidoPaterno, apellidoMaterno, areaLaboral, dni, correo, telefono, sexo, estadoContrato },
+      { autoCommit: true }
+    );
+    
+
+    res.status(201).send("Registro creado correctamente");
+  } catch (err) {
+    console.error("Error al crear el registro:", err);
+    res.status(500).send("Error al procesar la solicitud");
+  } finally {
+    if (connection) await connection.close();
+  }
+});
+
+// Actualizar un registro por ID
+app.put("/personal_cenate/:id", async (req, res) => {
+  let connection;
+  const id = req.params.id;
+  const {
+    nombres,
+    apellidoPaterno,
+    apellidoMaterno,
+    areaLaboral,
+    dni,
+    correo,
+    telefono,
+    sexo,
+    estadoContrato,
+  } = req.body;
+
+  try {
+    connection = await oracledb.getConnection(config);
+
+    const result = await connection.execute(
+      `
+      UPDATE CENATE_PERSONAL_2025
+      SET 
+        NOMBRES_PERSONAL = :nombres,
+        APEPATERNO_PERSONAL = :apellidoPaterno,
+        APEMATERNO_PERSONAL = :apellidoMaterno,
+        AREA_LABORAL_PERSONAL = :areaLaboral,
+        DNI_PERSONAL = :dni,
+        CORREO_PERSONAL = :correo,
+        NUM_TELEFONO_PERSONAL = :telefono,
+        SEXO_PERSONAL = :sexo,
+        COD_ESTADO_CONTRATO = :estadoContrato
+      WHERE ID_PERSONAL = :id
+    `,
+      { nombres, apellidoPaterno, apellidoMaterno, areaLaboral, dni, correo, telefono, sexo, estadoContrato, id },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected === 0) {
+      return res.status(404).send("Registro no encontrado");
+    }
+
+    res.status(200).send("Registro actualizado correctamente");
+  } catch (err) {
+    console.error("Error al actualizar el registro:", err);
+    res.status(500).send("Error al procesar la solicitud");
+  } finally {
+    if (connection) await connection.close();
+  }
+});
+
+// Eliminar un registro por ID
+app.delete("/personal_cenate/:id", async (req, res) => {
+  let connection;
+  const id = req.params.id;
+
+  try {
+    connection = await oracledb.getConnection(config);
+
+    const result = await connection.execute(
+      `
+      DELETE FROM CENATE_PERSONAL_2025
+      WHERE ID_PERSONAL = :id
+    `,
+      { id },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected === 0) {
+      return res.status(404).send("Registro no encontrado");
+    }
+
+    res.status(200).send("Registro eliminado correctamente");
+  } catch (err) {
+    console.error("Error al eliminar el registro:", err);
+    res.status(500).send("Error al procesar la solicitud");
+  } finally {
+    if (connection) await connection.close();
+  }
+});
+
+
+
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`Servidor escuchando en el puerto ${port}`);
