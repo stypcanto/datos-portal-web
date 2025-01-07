@@ -36,7 +36,8 @@ body {
 
 /* Contenedor */
 .container {
-  width: 90%;
+  width: 100%;
+ /*   width: 90%;  */
   max-width: 1700px;
   margin: -40px auto 20px; /* Ajuste negativo para conectar el header con el container */
   padding: 20px;
@@ -193,6 +194,41 @@ form .mb-3 {
   margin-bottom: 15px;
 }
 
+
+/* Estilo de la etiqueta */
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-right: 10px;
+  min-width: 100px; /* Asegura que las etiquetas no se muevan al cambiar el tamaño del texto */
+  text-align: right; /* Centra la etiqueta en relación con el campo de entrada */
+}
+
+/* Estilo para el input de búsqueda */
+#search-dni {
+  padding: 10px;
+  font-size: 16px;
+  width: 250px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+/* Efecto de enfoque (hover) en el input */
+#search-dni:focus {
+  border-color: #007BFF;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Placeholder personalizado */
+#search-dni::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+
 /* Estilo para el formulario de varias columnas */
 .row {
   display: flex;
@@ -286,6 +322,42 @@ form .form-control {
 .custom-select::-ms-expand {
   display: none;
 }
+
+
+
+#personalTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+#personalTable th, #personalTable td {
+  padding: 15px 20px;
+  text-align: left;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); /* Sombra interna en celdas */
+}
+
+#personalTable th {
+  background-color: var(--table-header-bg);
+  color: var(--table-header-color);
+  font-weight: bold;
+}
+
+#personalTable tr:nth-child(even) {
+  background-color: var(--table-bg);
+}
+
+#personalTable tr:hover {
+  background-color: var(--hover-bg);
+}
+
+#personalTable td {
+  transition: background-color 0.2s ease-in-out;
+}
+
 
 
 

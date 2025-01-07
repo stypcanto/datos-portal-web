@@ -1,9 +1,10 @@
 const express = require("express");
 const oracledb = require("oracledb");
 const path = require("path");
+const cors = require("cors"); // Agregar esta línea
 
 const app = express();
-const port = 3000;
+const PORT = 3000;
 
 // Configuración de Oracle Instant Client (modo Thick) - Maquina Jesus
 // oracledb.initOracleClient({
@@ -16,8 +17,9 @@ oracledb.initOracleClient({
  });
 
 
+
 // Configuración de conexión a Oracle
-const config = {
+const dbConfig = {
   user: "cenate",
   password: "cenate2018",
   connectString: "10.0.0.95:1521/devsalud",
@@ -26,384 +28,143 @@ const config = {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-
-// Middleware de debugging
-app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.url}`, req.body || {});
-  next();
-});
+app.use(cors());
 
 
-// Declarar la conexión fuera del bloque try-catch
-let connection;
+app.use(express.static(path.join(__dirname, 'public')));
 
 
-// Ruta para servir la página de soporte TI
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "users_ti.html"));
-});
-
-// Ruta para obtener datos de la tabla CENATE_SOPORTE_TI
-app.get("/data", async (req, res) => {
+// Función para conectarse a la base de datos
+async function connectToDB() {
   let connection;
   try {
-    connection = await oracledb.getConnection(config);
-    const result = await connection.execute(`
-      SELECT 
-        ID_SOPORTE_TI, 
-        NOMBRES_SOPORTE_TI, 
-        APEPATERNO_SOPORTE_TI, 
-        APEMATERNO_SOPORTE_TI, 
-        DNI_SOPORTE_TI, 
-        CORREO_SOPORTE_TI
-      FROM CENATE_SOPORTE_TI
-    `);
-
-    console.log(result.rows);
-    const headers = [
-      "ID",
-      "Nombres",
-      "Apellido Paterno",
-      "Apellido Materno",
-      "DNI",
-      "Correo Electrónico",
-    ];
-
-    res.json({ columns: headers, rows: result.rows });
+    connection = await oracledb.getConnection(dbConfig);
+    console.log("Conexión exitosa a la base de datos");
   } catch (err) {
-    console.error("Error en la conexión o consulta:", err);
-    res.status(500).send("Error en la base de datos");
-  } finally {
-    if (connection) await connection.close();
+    console.error("Error al conectar a la base de datos:", err);
+    throw err;
   }
-});
+  return connection;
+}
 
-
-// Nueva ruta para obtener datos de la tabla CENATE_PERSONAL_2025
+// Ruta GET para obtener todos los registros de personal (GET)
+// Ruta para obtener todos los registros de personal (GET)
 app.get("/personal_cenate", async (req, res) => {
   let connection;
-  let sql = `
-    SELECT 
-      ID_PERSONAL, 
-      NOMBRES_PERSONAL, 
-      APEPATERNO_PERSONAL, 
-      APEMATERNO_PERSONAL, 
-      AREA_LABORAL_PERSONAL, 
-      DNI_PERSONAL, 
-      CORREO_PERSONAL, 
-      NUM_TELEFONO_PERSONAL, 
-      SEXO_PERSONAL, 
-      COD_ESTADO_CONTRATO 
-    FROM CENATE_PERSONAL_2025
-  `;
-
-  let bindParams = {};
-
-  // Filtrar si se pasa un DNI
-  if (req.query.dni) {
-    const dni = req.query.dni;
-    sql += " WHERE DNI_PERSONAL = :dni";
-    bindParams.dni = dni;
-  }
-
   try {
-    connection = await oracledb.getConnection(config);
-    const result = await connection.execute(sql, bindParams);
+    connection = await connectToDB();
+    const sql = `
+    SELECT DNI, NOMBRE, APELLIDO, TO_CHAR(FECHANACIMIENTO, 'DD/MM/YYYY') FECHANACIMIENTO, TELEFONO, EMAIL, DIRECCION, GENERO,
+           COLEGIATURA, RNP, PROFESION, ESPECIALIDAD, TO_CHAR(FECHAINGRESOLABORAL, 'DD/MM/YYYY') FECHAINGRESOLABORAL,
+           TO_CHAR(FECHATERMINOLABORAL, 'DD/MM/YYYY') FECHATERMINOLABORAL, ACTIVO
+    FROM CENATE.CENATE_PERSONAL2025
+  `;
+    const result = await connection.execute(sql);
 
-    const headers = [
-      "ID",
-      "Nombres",
-      "Apellido Paterno",
-      "Apellido Materno",
-      "Área Laboral",
-      "DNI",
-      "Correo Electrónico",
-      "Teléfono",
-      "Sexo",
-      "Estado del Contrato",
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No se encontraron registros" });
+    }
+
+    const columns = [
+      'DNI', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Teléfono', 'Email', 'Dirección', 'Género',
+      'Colegiatura', 'RNP', 'Profesión', 'Especialidad', 'Fecha Ingreso Laboral', 'Fecha Termino Laboral', 'Activo'
     ];
 
-    res.json({ columns: headers, rows: result.rows });
+    const rows = result.rows.map(row => row.map(cell => cell || ''));
+
+    res.status(200).json({ columns, rows });
   } catch (err) {
-    console.error("Error en la conexión o consulta:", err);
-    res.status(500).send("Error en la base de datos");
+    console.error("Error al obtener los registros:", err);
+    res.status(500).json({ error: "Error al obtener los registros" });
   } finally {
-    if (connection) await connection.close();
-  }
-});
-
-
-// Ruta para modificar la página de soporte TI
-// Ruta para crear un nuevo registro
-app.post("/data", async (req, res) => {
-  let connection;
-  try {
-    const { nombres, apellidoPaterno, apellidoMaterno, dni, correo } = req.body;
-
-    console.log("Datos a insertar:", { nombres, apellidoPaterno, apellidoMaterno, dni, correo });
-
-    if (!nombres || !dni) {
-      return res.status(400).send("Datos incompletos");
-    }
-
-    connection = await oracledb.getConnection(config);
-    
-    // Insertar el nuevo registro, usando la secuencia para el ID
-    await connection.execute(
-      `
-      INSERT INTO CENATE_SOPORTE_TI 
-      (ID_SOPORTE_TI, NOMBRES_SOPORTE_TI, APEPATERNO_SOPORTE_TI, APEMATERNO_SOPORTE_TI, DNI_SOPORTE_TI, CORREO_SOPORTE_TI) 
-      VALUES (CENATE_SOPORTE_TI_SEQ.NEXTVAL, :nombres, :apellidoPaterno, :apellidoMaterno, :dni, :correo)
-    `,
-      { nombres, apellidoPaterno, apellidoMaterno, dni, correo },
-      { autoCommit: true }
-    );
-
-    res.status(201).send("Registro creado correctamente");
-  } catch (err) {
-    console.error("Error al crear el registro:", err);
-    res.status(500).send("Error al procesar la solicitud");
-  } finally {
-    if (connection) await connection.close();
-  }
-});
-
-
-// Ruta para actualizar un registro
-app.put("/data/:id", async (req, res) => {
-  let connection;
-  try {
-    const { id } = req.params;
-    const { nombres, apellidoPaterno, apellidoMaterno, dni, correo } = req.body;
-
-    console.log("Datos a actualizar:", { id, nombres, apellidoPaterno, apellidoMaterno, dni, correo });
-
-    if (!nombres || !dni) {
-      return res.status(400).send("Datos incompletos");
-    }
-
-    connection = await oracledb.getConnection(config);
-    await connection.execute(
-      `
-      UPDATE CENATE_SOPORTE_TI
-      SET NOMBRES_SOPORTE_TI = :nombres,
-          APEPATERNO_SOPORTE_TI = :apellidoPaterno,
-          APEMATERNO_SOPORTE_TI = :apellidoMaterno,
-          DNI_SOPORTE_TI = :dni,
-          CORREO_SOPORTE_TI = :correo
-      WHERE ID_SOPORTE_TI = :id
-    `,
-      { id, nombres, apellidoPaterno, apellidoMaterno, dni, correo },
-      { autoCommit: true }
-    );
-
-    res.status(200).send("Registro actualizado correctamente");
-  } catch (err) {
-    console.error("Error al actualizar el registro:", err);
-    res.status(500).send("Error al procesar la solicitud");
-  } finally {
-    if (connection) await connection.close();
-  }
-});
-
-// Ruta para eliminar un registro
-app.delete("/data/:id", async (req, res) => {
-  let connection;
-  try {
-    const { id } = req.params;
-
-    console.log("ID a eliminar:", id);
-
-    connection = await oracledb.getConnection(config);
-    await connection.execute(
-      `
-      DELETE FROM CENATE_SOPORTE_TI WHERE ID_SOPORTE_TI = :id
-    `,
-      { id },
-      { autoCommit: true }
-    );
-
-    res.status(200).send("Registro eliminado correctamente");
-  } catch (err) {
-    console.error("Error al eliminar el registro:", err);
-    res.status(500).send("Error al procesar la solicitud");
-  } finally {
-    if (connection) await connection.close();
-  }
-});
-
-
-
-
-
-// CRUD para modificar datos del personal
-// Crear un nuevo registro
-// Crear un nuevo registro
-app.post("/personal_cenate", async (req, res) => {
-  let connection;
-  try {
-    const {
-      nombres,
-      apellidoPaterno,
-      apellidoMaterno,
-      areaLaboral,
-      dni,
-      correo,
-      telefono,
-      sexo,
-      estadoContrato,
-    } = req.body;
-
-    // Validación de datos de entrada
-    if (!nombres || !apellidoPaterno || !dni || !correo || !telefono || !sexo || !estadoContrato) {
-      return res.status(400).send({ error: "Todos los campos son obligatorios excepto el apellido materno y área laboral" });
-    }
-
-    // Validación adicional de formato (si es necesario)
-    const dniRegex = /^\d{8}$/;  // Suponiendo que el DNI es un número de 8 dígitos
-    if (!dniRegex.test(dni)) {
-      return res.status(400).send({ error: "El DNI debe ser un número de 8 dígitos" });
-    }
-
-    // Conexión a la base de datos
-    connection = await oracledb.getConnection(config);
-
-    // Verificar si el DNI ya existe
-    const result = await connection.execute(
-      'SELECT COUNT(*) FROM CENATE_PERSONAL_2025 WHERE DNI_PERSONAL = :dni',
-      { dni }
-    );
-
-    const exists = result.rows[0][0] > 0;
-
-    if (exists) {
-      return res.status(400).send({ error: "El DNI ya está registrado" });
-    }
-
-    // Insertar el nuevo registro si el DNI no existe
-    await connection.execute(
-      `
-      INSERT INTO CENATE_PERSONAL_2025 
-      (ID_PERSONAL, NOMBRES_PERSONAL, APEPATERNO_PERSONAL, APEMATERNO_PERSONAL, AREA_LABORAL_PERSONAL, DNI_PERSONAL, CORREO_PERSONAL, NUM_TELEFONO_PERSONAL, SEXO_PERSONAL, COD_ESTADO_CONTRATO) 
-      VALUES (CENATE.CENATE_PERSONAL_SEQ.NEXTVAL, :nombres, :apellidoPaterno, :apellidoMaterno, :areaLaboral, :dni, :correo, :telefono, :sexo, :estadoContrato)
-    `,
-      { nombres, apellidoPaterno, apellidoMaterno, areaLaboral, dni, correo, telefono, sexo, estadoContrato },
-      { autoCommit: true }
-    );
-    
-    // Respuesta exitosa
-    res.status(201).send({ message: "Registro creado correctamente" });
-  } catch (err) {
-    console.error("Error al crear el registro:", err);
-
-    // Manejo de errores específicos de la base de datos
-    if (err.message.includes("ORA-00001")) {
-      return res.status(400).send({ error: "El DNI ya está registrado" });
-    }
-
-    // Respuesta genérica para otros errores
-    res.status(500).send({ error: "Error al procesar la solicitud. Intenta nuevamente más tarde." });
-  } finally {
-    // Asegurarse de cerrar la conexión
     if (connection) {
       try {
         await connection.close();
-      } catch (closeErr) {
-        console.error("Error al cerrar la conexión:", closeErr);
+      } catch (err) {
+        console.error("Error al cerrar la conexión", err);
       }
     }
   }
 });
 
 
-// Actualizar un registro por ID
-app.put("/personal_cenate/:id", async (req, res) => {
-  let connection;
-  const id = req.params.id;
+
+// Ruta para insertar un nuevo registro (POST)
+app.post("/personal_cenate", async (req, res) => {
   const {
-    nombres,
-    apellidoPaterno,
-    apellidoMaterno,
-    areaLaboral,
     dni,
-    correo,
+    nombre,
+    apellido,
+    fechanacimiento,
     telefono,
-    sexo,
-    estadoContrato,
+    email,
+    direccion,
+    genero,
+    colegiatura,
+    rnp,
+    profesion,
+    especialidad,
+    fechaingresolaboral,
+    fechaterminolaboral,
+    activo,
   } = req.body;
 
-  try {
-    connection = await oracledb.getConnection(config);
-
-    const result = await connection.execute(
-      `
-      UPDATE CENATE_PERSONAL_2025
-      SET 
-        NOMBRES_PERSONAL = :nombres,
-        APEPATERNO_PERSONAL = :apellidoPaterno,
-        APEMATERNO_PERSONAL = :apellidoMaterno,
-        AREA_LABORAL_PERSONAL = :areaLaboral,
-        DNI_PERSONAL = :dni,
-        CORREO_PERSONAL = :correo,
-        NUM_TELEFONO_PERSONAL = :telefono,
-        SEXO_PERSONAL = :sexo,
-        COD_ESTADO_CONTRATO = :estadoContrato
-      WHERE ID_PERSONAL = :id
-    `,
-      { nombres, apellidoPaterno, apellidoMaterno, areaLaboral, dni, correo, telefono, sexo, estadoContrato, id },
-      { autoCommit: true }
-    );
-
-    if (result.rowsAffected === 0) {
-      return res.status(404).send("Registro no encontrado");
-    }
-
-    res.status(200).send("Registro actualizado correctamente");
-  } catch (err) {
-    console.error("Error al actualizar el registro:", err);
-    res.status(500).send("Error al procesar la solicitud");
-  } finally {
-    if (connection) await connection.close();
-  }
-});
-
-// Eliminar un registro por ID
-app.delete("/personal_cenate/:id", async (req, res) => {
   let connection;
-  const id = req.params.id;
 
   try {
-    connection = await oracledb.getConnection(config);
-
-    const result = await connection.execute(
-      `
-      DELETE FROM CENATE_PERSONAL_2025
-      WHERE ID_PERSONAL = :id
-    `,
-      { id },
-      { autoCommit: true }
-    );
-
-    if (result.rowsAffected === 0) {
-      return res.status(404).send("Registro no encontrado");
+    // Validación básica de datos
+    if (!dni || !nombre || !apellido || !telefono || !email || !direccion || !genero || !colegiatura || !rnp || !profesion || !especialidad || activo === undefined) {
+      return res.status(400).json({ error: "Faltan datos obligatorios" });
     }
 
-    res.status(200).send("Registro eliminado correctamente");
+    connection = await connectToDB();
+
+    const sql = `
+      INSERT INTO CENATE.CENATE_PERSONAL2025 (
+        DNI, NOMBRE, APELLIDO, FECHANACIMIENTO, TELEFONO, EMAIL, DIRECCION, GENERO,
+        COLEGIATURA, RNP, PROFESION, ESPECIALIDAD, FECHAINGRESOLABORAL, FECHATERMINOLABORAL, ACTIVO
+      ) VALUES (
+        :dni, :nombre, :apellido, TO_DATE(:fechanacimiento, 'YYYY-MM-DD'), :telefono, :email, :direccion, :genero,
+        :colegiatura, :rnp, :profesion, :especialidad, TO_DATE(:fechaingresolaboral, 'YYYY-MM-DD'), TO_DATE(:fechaterminolaboral, 'YYYY-MM-DD'), :activo
+      )
+    `;
+
+    const binds = {
+      dni,
+      nombre,
+      apellido,
+      fechanacimiento: fechanacimiento || null,
+      telefono,
+      email,
+      direccion,
+      genero,
+      colegiatura,
+      rnp,
+      profesion,
+      especialidad,
+      fechaingresolaboral: fechaingresolaboral || null,
+      fechaterminolaboral: fechaterminolaboral || null,
+      activo,
+    };
+
+    await connection.execute(sql, binds, { autoCommit: true });
+
+    res.status(201).json({ message: "Registro creado con éxito" });
   } catch (err) {
-    console.error("Error al eliminar el registro:", err);
-    res.status(500).send("Error al procesar la solicitud");
+    console.error("Error al guardar el registro:", err);
+    res.status(500).json({ error: "Error al agregar el registro" });
   } finally {
-    if (connection) await connection.close();
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error al cerrar la conexión:", err);
+      }
+    }
   }
 });
-
-
-
-
-
 
 // Iniciar el servidor
-app.listen(port, () => {
-  console.log(`Servidor escuchando en el puerto ${port}`);
+app.listen(PORT, () => {
+  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });

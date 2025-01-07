@@ -2,6 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Personal CENATE</title>
     <link rel="stylesheet" href="./css/style2.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
@@ -10,67 +11,70 @@
     <!-- Logos en la parte superior -->
     <header class="header">
       <div class="logo-left">
-        <img src="img/LOGO ESSALUD.png" alt="Logo Izquierdo">
+        <img src="img/LOGO ESSALUD.png" alt="Logo Izquierdo" />
       </div>
       <div class="logo-right">
-        <img src="img/LOGO CENATE.png" alt="Logo Derecho">
+        <img src="img/LOGO CENATE.png" alt="Logo Derecho" />
       </div>
-     
     </header>
 
     <div class="container">
       <h1 class="titulo">Personal de CENATE</h1>
-      
+
       <!-- Spinner de carga -->
-      <div class="text-center mb-3" id="loading-spinner">
+      <div class="text-center mb-3" id="loading-spinner" style="display:none;">
         <div class="spinner-border" role="status">
           <span class="visually-hidden">Cargando...</span>
         </div>
       </div>
-      
+
       <!-- Tabla de Datos -->
       <div class="table-container">
-        <table id="data-table" class="table table-bordered table-striped">
+        <table id="personalTable" class="table table-bordered table-striped">
           <thead>
-            <tr></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colspan="10">Cargando datos...</td>
+            <tr id="tableHeader">
+              <!-- Aquí se insertarán los encabezados de la tabla -->
             </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Aquí se insertarán las filas de la tabla -->
           </tbody>
         </table>
       </div>
-      
+
       <!-- Botón para exportar a Excel -->
       <button id="export-btn" class="btn">Exportar a Excel</button>
 
-       <!-- Botón para editar -->
-       <button id="editar-btn" class="btn">Editar Datos</button>
+      <!-- Botón para editar -->
+      <button id="editar-btn" class="btn">Editar Datos</button>
     </div>
 
     <script>
       let allData = [];
 
+      // Función para cargar los datos del personal desde la API
       async function fetchData() {
         const spinner = document.getElementById("loading-spinner");
-        const tbody = document.querySelector("#data-table tbody");
+        const tbody = document.querySelector("#personalTable tbody");
 
-        spinner.style.display = "block";
+        spinner.style.display = "block"; // Mostrar spinner de carga
 
         try {
-          const response = await fetch("/personal_cenate");
+          const response = await fetch("http://localhost:3000/personal_cenate"); // Usar la URL correcta del backend
           if (!response.ok) {
             throw new Error(`Error en la solicitud: ${response.statusText}`);
           }
 
           const data = await response.json();
+          console.log("Datos obtenidos:", data);  // Imprime la respuesta de la API en consola
 
-          if (Array.isArray(data.columns) && Array.isArray(data.rows)) {
+          if (Array.isArray(data.rows)) {
             allData = data.rows;
-            const thead = document.querySelector("#data-table thead");
+            const thead = document.querySelector("#personalTable thead");
+            // Insertar los encabezados de la tabla dinámicamente
             thead.innerHTML = `<tr>${data.columns.map(col => `<th>${col}</th>`).join("")}</tr>`;
 
+            // Insertar las filas de datos en la tabla
             tbody.innerHTML = data.rows
               .map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`)
               .join("");
@@ -79,31 +83,32 @@
           }
         } catch (error) {
           console.error("Error al obtener los datos:", error);
-          tbody.innerHTML = "<tr><td colspan='10'>Error al cargar los datos</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='15'>Error al cargar los datos</td></tr>"; // Mostrar mensaje de error en la tabla
         } finally {
-          spinner.style.display = "none";
+          spinner.style.display = "none"; // Ocultar spinner de carga
         }
       }
 
-
- // Función para redirigir a la página de edición
-    document.addEventListener("DOMContentLoaded", () => {
+      // Función para redirigir a la página de edición
+      document.addEventListener("DOMContentLoaded", () => {
+        // Al hacer clic en el botón de editar
         document.getElementById("editar-btn").addEventListener("click", () => {
-         window.location.href = "/modified_personal_cenate.html";
-       });
-  });
+          window.location.href = "/modified_personal.html"; // Redirige a la página de edición
+        });
 
+        // Llamar a la función fetchData cuando el DOM esté completamente cargado
+        fetchData();
+      });
 
+      // Función para exportar los datos a un archivo Excel
       document.getElementById("export-btn").addEventListener("click", () => {
         const wb = XLSX.utils.book_new();
-        const table = document.getElementById("data-table");
+        const table = document.getElementById("personalTable");
         const ws = XLSX.utils.table_to_sheet(table);
 
         XLSX.utils.book_append_sheet(wb, ws, "Datos");
         XLSX.writeFile(wb, "personal_cenate.xlsx");
       });
-
-      fetchData();
     </script>
   </body>
 </html>

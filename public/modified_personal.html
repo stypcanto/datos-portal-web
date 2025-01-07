@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Personal CENATE</title>
+    <link rel="stylesheet" href="./css/style2.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <style>
+      
+      .hidden {
+    display: none;
+  }
+
+
+      .required::after {
+        content: " *";
+        color: red;
+      }
+    </style>
+  </head>
+<body>
+  <!-- Logos en la parte superior -->
+  <header class="header">
+    <div class="logo-left">
+      <img src="img/LOGO ESSALUD.png" alt="Logo Izquierdo">
+    </div>
+    <div class="logo-right">
+      <img src="img/LOGO CENATE.png" alt="Logo Derecho">
+    </div>
+  </header>
+
+  <div class="container">
+    <h1 class="titulo">Registro de Personal CENATE</h1>
+    
+    <!-- Formulario para buscar por DNI -->
+    <div class="form-container" id="search-form">
+      <h2>Ingrese el número de DNI</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <label for="search-dni">DNI:</label>
+          <input type="text" id="search-dni" class="form-control" required placeholder="Ingrese el DNI a buscar">
+        </div>
+      </div>
+      <div class="btn-container">
+        <button class="btn" onclick="fetchDataByDni()">Buscar</button>
+        <button class="btn" onclick="showAddForm()">Agregar Registro</button>
+        <button class="btn" onclick="goToDirectory()">Regresar al Directorio</button>
+  
+      </div>
+    </div>
+
+   <!-- Formulario para agregar un nuevo registro -->
+   <div class="form-container hidden" id="add-form">
+    <h2>Agregar Nuevo Registro</h2>
+    <form id="add-form-fields">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="mb-3">
+            <label for="dni" class="form-label required">DNI</label>
+            <input
+              type="text"
+              class="form-control"
+              id="dni"
+              placeholder="Ingrese el número de DNI"
+              pattern="^\d{8}$"
+              maxlength="8"
+              required
+              oninput="validateDNI(this)" />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label for="nombre" class="required">Nombre:</label>
+          <input type="text" id="nombre" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label for="apellido" class="required">Apellido:</label>
+          <input type="text" id="apellido" class="form-control" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <label for="fechanacimiento" class="required">Fecha de Nacimiento:</label>
+          <input type="date" id="fechanacimiento" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <div class="mb-3">
+            <label for="telefono" class="form-label required">Teléfono</label>
+            <input
+              type="text"
+              class="form-control"
+              id="telefono"
+              placeholder="Ingrese el número de celular"
+              pattern="^\d{9}$"
+              maxlength="9"
+              required
+              oninput="validateTelefono(this)" />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="mb-3">
+            <label for="correo" class="form-label required">Correo electrónico</label>
+            <input
+              type="email"
+              class="form-control"
+              id="correo"
+              placeholder="Ingrese el correo personal"
+              required
+              pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+              title="Por favor, ingrese un correo electrónico válido" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <label for="direccion" class="required">Dirección:</label>
+          <input type="text" id="direccion" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label for="genero" class="form-label required">Género</label>
+          <select id="genero" class="form-control custom-select" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="colegiatura" class="required">Colegiatura:</label>
+          <input type="text" id="colegiatura" class="form-control" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <label for="rnp" class="required">RNP:</label>
+          <input type="text" id="rnp" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label for="profesion" class="required">Profesión:</label>
+          <select id="profesion" class="form-control" required>
+            <option value="" disabled selected>Seleccione una profesión</option>
+            <option value="Médico">Médico</option>
+            <option value="Enfermero/a">Enfermero/a</option>
+            <option value="Técnico de Radiología">Técnico de Radiología</option>
+            <option value="Farmacéutico/a">Farmacéutico/a</option>
+            <option value="Técnico de Laboratorio">Técnico de Laboratorio</option>
+            <option value="Nutricionista">Nutricionista</option>
+            <option value="Psicólogo/a">Psicólogo/a</option>
+            <option value="Terapeuta Ocupacional">Terapeuta Ocupacional</option>
+            <option value="Fisioterapeuta">Fisioterapeuta</option>
+            <option value="Técnico en Emergencias Médicas">Técnico en Emergencias Médicas</option>
+            <option value="Odontólogo/a">Odontólogo/a</option>
+    
+            <option value="Cirujano/a Estético">Cirujano/a Estético</option>
+            <option value="Bioquímico/a">Bioquímico/a</option>
+            <option value="Dermatólogo/a Estético">Dermatólogo/a Estético</option>
+            <option value="Técnico de Farmacia">Técnico de Farmacia</option>
+            <option value="Asistente Social">Asistente Social</option>
+            <option value="Administrativo/a">Administrativo/a</option>
+            <option value="Ingeniero/a">Administrativo/a</option>
+            <option value="Administrador/a en salud">Administrativo/a</option>
+          </select>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="especialidad" class="required">Especialidad:</label>
+          <select id="especialidad" class="form-control" required>
+            <option value="" disabled selected>Seleccione una especialidad</option>
+            <option value="Anestesiología">Anestesiología</option>
+            <option value="Cardiología">Cardiología</option>
+            <option value="Cirugía General">Cirugía General</option>
+            <option value="Dermatología">Dermatología</option>
+            <option value="Endocrinología">Endocrinología</option>
+            <option value="Gastroenterología">Gastroenterología</option>
+            <option value="Gineco-obstetricia">Gineco-obstetricia</option>
+            <option value="Hematología">Hematología</option>
+            <option value="Infectología">Infectología</option>
+            <option value="Medicina de Urgencias">Medicina de Urgencias</option>
+            <option value="Medicina Familiar">Medicina Familiar</option>
+            <option value="Medicina Interna">Medicina Interna</option>
+            <option value="Neumología">Neumología</option>
+            <option value="Neurología">Neurología</option>
+            <option value="Oncología">Oncología</option>
+            <option value="Oftalmología">Oftalmología</option>
+            <option value="Otorrinolaringología">Otorrinolaringología</option>
+            <option value="Pediatría">Pediatría</option>
+            <option value="Psiquiatría">Psiquiatría</option>
+            <option value="Reumatología">Reumatología</option>
+            <option value="Traumatología">Traumatología</option>
+            <option value="Urología">Urología</option>
+            <option value="Cirugía Plástica">Cirugía Plástica</option>
+            <option value="Cirugía Cardiovascular">Cirugía Cardiovascular</option>
+            <option value="Cirugía Oncológica">Cirugía Oncológica</option>
+            <option value="Cirugía Vascular">Cirugía Vascular</option>
+            <option value="Médicina Deportiva">Medicina Deportiva</option>
+            <option value="Neurocirugía">Neurocirugía</option>
+            <option value="Toxicología">Toxicología</option>
+            <option value="Médico Forense">Médico Forense</option>
+            <option value="Radiología y Diagnóstico por Imágenes">Radiología y Diagnóstico por Imágenes</option>
+            <option value="Geriatría">Geriatría</option>
+            <option value="Nefrología">Nefrología</option>
+            <option value="Cirugía Estética">Cirugía Estética</option>
+            <option value="Medicina Paliativa">Medicina Paliativa</option>
+            <option value="Medicina Preventiva">Medicina Preventiva</option>
+            <option value="Ginecología Oncológica">Ginecología Oncológica</option>
+            <option value="Cardiología Intervencionista">Cardiología Intervencionista</option>
+            <option value="Cirugía Oral y Maxilofacial">Cirugía Oral y Maxilofacial</option>
+            <option value="Pediatría Oncológica">Pediatría Oncológica</option>
+            <option value="Cirugía Torácica">Cirugía Torácica</option>
+            <option value="Dermatología Estética">Dermatología Estética</option>
+            <option value="Endocrinología Pediátrica">Endocrinología Pediátrica</option>
+            <option value="Neurología Pediátrica">Neurología Pediátrica</option>
+            <option value="Medicina Intensiva">Medicina Intensiva</option>
+            <option value="Maternidad y Ginecología">Maternidad y Ginecología</option>
+            <option value="Obstetricia">Obstetricia</option>
+            <option value="Fisiatría">Fisiatría</option>
+            <option value="Médico Estético">Médico Estético</option>
+            <option value="Endoscopia">Endoscopia</option>
+            <option value="Medicina Tradicional China">Medicina Tradicional China</option>
+            <option value="Medicina Integrativa">Medicina Integrativa</option>
+            <option value="Biología Molecular">Biología Molecular</option>
+            <option value="Medicina del Sueño">Medicina del Sueño</option>
+            <option value="Patología">Patología</option>
+            <option value="Salud Mental">Salud Mental</option>
+            <option value="Pediatría Neonatal">Pediatría Neonatal</option>
+            <option value="Endocrinología Ginecológica">Endocrinología Ginecológica</option>
+            <option value="Pediatría Cardiológica">Pediatría Cardiológica</option>
+            <option value="Odontología General">Odontología General</option>
+            <option value="Odontología Pediátrica">Odontología Pediátrica</option>
+            <option value="Médicina Estética">Médicina Estética</option>
+            <option value="Gineco-endocrinología">Gineco-endocrinología</option>
+          </select>
+        </div>
+        
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <label for="fechaingresolaboral" class="required">Fecha Ingreso Laboral:</label>
+          <input type="date" id="fechaingresolaboral" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label for="fechaterminolaboral">Fecha Terminación Laboral:</label>
+          <input type="date" id="fechaterminolaboral" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <label for="activo" class="required">Activo:</label>
+          <select id="activo" class="form-control custom-select" required>
+            <option value="S" selected>Sí</option>
+            <option value="N">No</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" class="btn" onclick="addPerson()">Guardar Registro</button>
+      <button type="button" class="btn" onclick="clearForm()">Limpiar Formulario</button>
+      <button type="button" class="btn" onclick="goBack()">Cerrar el nuevo registro</button>
+    </form>
+  </div>
+
+  <!-- Contenedor para mostrar la lista de registros -->
+  <div id="listContainer"></div>
+</div>
+
+<script>
+  // Función para mostrar el formulario de agregar registro
+  function showAddForm() {
+    document.getElementById('add-form').classList.remove('hidden');
+  }
+
+  // Función para ocultar el formulario de agregar registro
+  function hideAddForm() {
+    document.getElementById('add-form').classList.add('hidden');
+  }
+
+  // Función para convertir la fecha a formato 'DD/MM/YYYY'
+  function convertToDDMMYYYY(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  // Función para validar el DNI
+  function validateDNI(input) {
+    const regex = /^\d{8}$/;
+    if (!regex.test(input.value)) {
+      input.setCustomValidity("El DNI debe tener 8 dígitos.");
+    } else {
+      input.setCustomValidity("");
+    }
+  }
+
+  // Función para agregar un nuevo registro
+  function addPerson() {
+    const dni = document.getElementById('dni').value;
+    const nombre = document.getElementById('nombre').value;
+    const apellido = document.getElementById('apellido').value;
+    const fechanacimiento = document.getElementById('fechanacimiento').value;
+    const telefono = document.getElementById('telefono').value;
+    const correo = document.getElementById('correo').value;
+    const direccion = document.getElementById('direccion').value;
+    const genero = document.getElementById('genero').value;
+    const colegiatura = document.getElementById('colegiatura').value;
+    const rnp = document.getElementById('rnp').value;
+    const profesion = document.getElementById('profesion').value;
+    const especialidad = document.getElementById('especialidad').value;
+    const fechaingresolaboral = document.getElementById('fechaingresolaboral').value;
+    const fechaterminolaboral = document.getElementById('fechaterminolaboral').value;
+    const activo = document.getElementById('activo').value;
+
+    const personData = {
+      dni,
+      nombre,
+      apellido,
+      fechanacimiento: convertToDDMMYYYY(fechanacimiento),
+      telefono,
+      correo,
+      direccion,
+      genero,
+      colegiatura,
+      rnp,
+      profesion,
+      especialidad,
+      fechaingresolaboral: convertToDDMMYYYY(fechaingresolaboral),
+      fechaterminolaboral: fechaterminolaboral ? convertToDDMMYYYY(fechaterminolaboral) : null,
+      activo,
+    };
+
+    fetch('/personal_cenate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(personData),
+    })
+    .then(response => {
+      if (response.ok) {
+        alert("Registro agregado correctamente");
+        clearForm();
+      } else {
+        alert("Error al agregar el registro");
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Hubo un problema al agregar el registro.');
+    });
+  }
+
+  // Función para limpiar el formulario
+  function clearForm() {
+    document.getElementById('add-form-fields').reset();
+  }
+
+  // Función para reload
+  function goBack() {
+    window.location.reload();
+  }
+
+  // Función para redirigir al directorio
+  function goToDirectory() {
+    window.location.href = '/personal_cenate.html';
+  }
+
+  // Función para obtener los datos por DNI
+  async function fetchDataByDni() {
+    const dni = document.getElementById('search-dni').value;
+    if (dni) {
+      try {
+        const response = await fetch(`/personal_cenate/${dni}`);
+        if (response.ok) {
+          const data = await response.json();
+          const listContainer = document.getElementById('listContainer');
+          listContainer.innerHTML = '';
+
+          const personDiv = document.createElement('div');
+          personDiv.classList.add('person-card');
+
+          Object.keys(data).forEach(key => {
+            const row = document.createElement('div');
+            row.classList.add('row');
+            const label = document.createElement('label');
+            label.textContent = key + ':';
+            const value = document.createElement('span');
+            value.textContent = data[key];
+
+            row.appendChild(label);
+            row.appendChild(value);
+            personDiv.appendChild(row);
+          });
+
+          listContainer.appendChild(personDiv);
+        } else {
+          alert('No se encontró el registro.');
+        }
+      } catch (error) {
+        console.error('Error al obtener los datos:', error);
+        alert('Hubo un error al cargar los datos.');
+      } finally {
+        // Aquí es donde cerrarías la conexión de la base de datos (en el backend).
+      }
+    } else {
+      alert('Por favor ingrese un DNI.');
+    }
+  }
+</script>
+  
+</body>
+</html>
