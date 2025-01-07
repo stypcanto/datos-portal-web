@@ -26,41 +26,29 @@
 }
 
 /* Global styles */
+/* Estilos globales */
 body {
-  font-family: var(--font-family);
-  background-color: var(--titulo);
-  color: #333;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f9fa;
   margin: 0;
   padding: 0;
 }
 
-/* Contenedor */
+/* Contenedor principal */
 .container {
   width: 100%;
- /*   width: 90%;  */
-  max-width: 1700px;
-  margin: -40px auto 20px; /* Ajuste negativo para conectar el header con el container */
+  max-width: 1600px;
+  margin: 20px auto;
   padding: 20px;
   background-color: var(--white);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  z-index: 1;
   position: relative;
 }
 
-/* Título */
-.titulo {
-  color: var(--titulo);
-  font-weight: bold;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-  margin: 0 auto;
-  text-align: center;
-  position: relative;
-}
-
-/* Encabezado con fondo azul */
+/* Encabezado */
 .header {
-  background-color: var(--titulo);
+  background-color: #1b476c;
   position: relative;
   text-align: center;
   padding: 70px 0;
@@ -87,78 +75,24 @@ body {
   height: auto;
 }
 
-/* Table styles */
-#data-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Título */
+.titulo {
+  color: var(--titulo);
+  font-weight: bold;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  font-size: 2rem;
+  padding-bottom: 10px;
+}
+
+/* Estilo de la tabla */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-top: 20px;
 }
 
-#data-table th,
-#data-table td {
-  padding: 12px 15px;
-  text-align: center;
-  border: 1px solid var(--border-color);
-  font-size: 14px;
-}
-
-/* Table header */
-#data-table th {
-  background-color: var(--table-header-bg);
-  color: var(--table-header-color);
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-/* Table row hover effect */
-#data-table tr:hover {
-  background-color: var(--hover-bg);
-}
-
-/* Alternating row colors */
-#data-table tr:nth-child(even) {
-  background-color: var(--table-bg);
-}
-
-/* Loading spinner */
-#loading-spinner {
-  display: none;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.spinner-border {
-  width: 50px;
-  height: 50px;
-  border-width: 5px;
-  border-color: var(--primary-color) transparent transparent transparent;
-}
-
-/* Button styles */
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: var(--primary-color);
-  color: var(--white);
-  border-radius: 6px;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  margin-top: 20px;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-
-.btn:active {
-  background-color: #003d7a;
-  transform: translateY(2px);
-}
 
 /* Estilos de los campos del formulario */
 form .form-label {
@@ -194,7 +128,6 @@ form .mb-3 {
   margin-bottom: 15px;
 }
 
-
 /* Estilo de la etiqueta */
 label {
   font-size: 14px;
@@ -227,7 +160,6 @@ label {
   color: #aaa;
   font-style: italic;
 }
-
 
 /* Estilo para el formulario de varias columnas */
 .row {
@@ -328,70 +260,202 @@ form .form-control {
 #personalTable {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-#personalTable th, #personalTable td {
-  padding: 15px 20px;
+#personalTable th, 
+#personalTable td {
+  padding: 12px 15px;
   text-align: left;
-  border: 1px solid var(--border-color);
+  border: 1px solid #ddd;
   font-size: 14px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); /* Sombra interna en celdas */
 }
 
 #personalTable th {
-  background-color: var(--table-header-bg);
-  color: var(--table-header-color);
+  background-color: #546980;
+  color: #fff;
   font-weight: bold;
 }
 
 #personalTable tr:nth-child(even) {
-  background-color: var(--table-bg);
+  background-color: #f4f4f4;
 }
 
 #personalTable tr:hover {
-  background-color: var(--hover-bg);
+  background-color: #f1f1f1;
 }
 
-#personalTable td {
-  transition: background-color 0.2s ease-in-out;
+/* Botones */
+.btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: 20px;
 }
 
+.btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
 
+.btn:active {
+  background-color: #003d7a;
+  transform: translateY(2px);
+}
 
+/* Spinner */
+#loading-spinner {
+  display: none;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-/* Responsive styles */
+.spinner-border {
+  width: 50px;
+  height: 50px;
+  border-width: 5px;
+  border-color: #007bff transparent transparent transparent;
+}
+
+/* Responsive */
+@media (max-width: 1440px) {
+  .container {
+    padding: 15px;
+  }
+
+  #personalTable th, #personalTable td {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .btn {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 10px;
+  }
+
+  /* Ajustar la tabla */
+  .table-container {
+    overflow-x: auto;
+  }
+
+  #personalTable {
+    width: 100%;
+    min-width: 600px;
+    font-size: 12px;
+  }
+
+  #personalTable th, 
+  #personalTable td {
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  /* Ocultar columnas menos importantes */
+  #personalTable td:nth-child(4), 
+  #personalTable td:nth-child(5) {
+    display: none;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .titulo {
+    font-size: 1.4rem;
+  }
+
+  .logo-left img, .logo-right img {
+    width: 120px;
+  }
+}
+
 @media (max-width: 768px) {
-  
-  .row {
-    flex-wrap: wrap; /* En dispositivos pequeños, permite que las columnas se reorganicen verticalmente */
+  .container {
+    padding: 10px;
   }
-  .col-md-4 {
-    flex: 1 1 100%; /* Las columnas ocupan el ancho completo */
-    max-width: 100%;
-  }
-  
-  #data-table th, #data-table td {
+
+  #personalTable th, #personalTable td {
     font-size: 12px;
     padding: 8px 10px;
   }
 
   .btn {
-    padding: 8px 16px;
-  }
-
-  /* Para formularios en pantallas pequeñas */
-  .col-md-4 {
-    flex: 1 1 100%;
-    padding: 5px;
-  }
-
-  form .form-control {
-    padding: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
   }
 
   .titulo {
-    font-size: 1.5rem; /* Reducir tamaño del título en pantallas pequeñas */
+    font-size: 1.5rem;
+  }
+
+  .logo-left img, .logo-right img {
+    width: 100px;
   }
 }
+
+@media (max-width: 390px) {
+  .container {
+    padding: 5px;
+  }
+
+  #personalTable {
+    font-size: 10px;
+  }
+
+  #personalTable th, #personalTable td {
+    padding: 6px 8px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .titulo {
+    font-size: 1.2rem;
+  }
+
+  .logo-left img, .logo-right img {
+    width: 80px;
+  }
+}
+
+@media (max-width: 320px) {
+  .container {
+    padding: 5px;
+  }
+
+  #personalTable {
+    font-size: 10px;
+  }
+
+  #personalTable th, #personalTable td {
+    padding: 6px 8px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .titulo {
+    font-size: 1.2rem;
+  }
+
+  .logo-left img, .logo-right img {
+    width: 70px;
+  }
+}
+
