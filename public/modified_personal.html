@@ -10,11 +10,6 @@
       .hidden {
         display: none;
       }
-
-      .required::after {
-        content: " *";
-        color: red;
-      }
     </style>
   </head>
   <body>
@@ -71,8 +66,6 @@
               function validateDNI(input) {
                 const dni = input.value;
                 const regex = /^\d{8}$/;
-            
-                // Solo muestra el mensaje si el DNI es incorrecto y tiene exactamente 8 dígitos
                 if (dni && !regex.test(dni)) {
                   input.setCustomValidity("El DNI debe tener 8 dígitos.");
                 } else {
@@ -113,8 +106,6 @@
               function validateTelefono(input) {
                 const telefono = input.value;
                 const regex = /^\d{9}$/;
-            
-                // Solo muestra el mensaje si el teléfono es incorrecto y tiene exactamente 9 dígitos
                 if (telefono && !regex.test(telefono)) {
                   input.setCustomValidity("El teléfono debe tener 9 dígitos.");
                 } else {
@@ -164,7 +155,6 @@
               <label for="profesion" class="required">Profesión:</label>
               <select id="profesion" class="form-control" required>
                 <option value="" disabled selected>Seleccione una profesión</option>
-                <!-- Options for profession -->
                 <option value="Médico">Médico</option>
                 <option value="Enfermero/a">Enfermero/a</option>
                 <option value="Técnico de Radiología">Técnico de Radiología</option>
@@ -183,7 +173,6 @@
               <label for="especialidad" class="required">Especialidad:</label>
               <select id="especialidad" class="form-control" required>
                 <option value="" disabled selected>Seleccione una especialidad</option>
-                <!-- Options for specialties -->
                 <option value="Anestesiología">Anestesiología</option>
                 <option value="Cardiología">Cardiología</option>
                 <option value="Cirugía General">Cirugía General</option>
@@ -191,7 +180,6 @@
                 <option value="Endocrinología">Endocrinología</option>
               </select>
             </div>
-            
           </div>
           <div class="row">
             <div class="col-md-4">
@@ -210,178 +198,23 @@
               </select>
             </div>
           </div>
-          <button type="button" class="btn" onclick="addPerson()">Guardar Registro</button>
+          <button type="button" id="save-button" class="btn" onclick="savePerson()">Guardar Registro</button>
           <button type="button" class="btn" onclick="clearForm()">Limpiar Formulario</button>
           <button type="button" class="btn" onclick="goBack()">Cerrar el nuevo registro</button>
+          <!-- Botón de eliminar, inicialmente oculto -->
+          <div id="modify-delete-buttons" class="hidden">
+            <!-- Botones para modificar y eliminar -->
+            <button id="save-button">Actualizar Registro</button>
+            <button id="delete-button" class="hidden">Eliminar Registro</button>
+        </div>
+        
         </form>
       </div>
-
-      <!-- Contenedor para mostrar la lista de registros -->
-      <div id="listContainer"></div>
     </div>
 
-    <script>
-      // Función para mostrar el formulario de agregar registro
-      function showAddForm() {
-        document.getElementById('add-form').classList.remove('hidden');
-      }
-
-      // Función para ocultar el formulario de agregar registro
-      function hideAddForm() {
-        document.getElementById('add-form').classList.add('hidden');
-      }
-
-      // Función para convertir la fecha a formato 'DD/MM/YYYY'
-      function formatDate(date) {
-        const d = new Date(date);
-        const day = ("0" + d.getDate()).slice(-2);
-        const month = ("0" + (d.getMonth() + 1)).slice(-2);
-        const year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-      }
+ <!-- Cargar el archivo JavaScript 'app.js' -->
+<script src="./js/app.js"></script>
 
   
-
-      function validateTelefono(input) {
-    const telefono = input.value;
-    const regex = /^\d{9}$/;
-
-    // Solo muestra el mensaje si el teléfono es incorrecto y tiene exactamente 9 dígitos
-    if (telefono && !regex.test(telefono)) {
-      input.setCustomValidity("El teléfono debe tener 9 dígitos.");
-    } else {
-      input.setCustomValidity("");
-    }
-  }
-      
-      // Funciones para manejar el formulario
-   
-
-
-      function addPerson() {
-    const dni = document.getElementById('dni').value.trim();
-    const nombre = document.getElementById('nombre').value.trim();
-    const apellido = document.getElementById('apellido').value.trim();
-    const fechanacimiento = document.getElementById('fechanacimiento').value || null; // Formato YYYY-MM-DD
-    const telefono = document.getElementById('telefono').value.trim();
-    const correo = document.getElementById('correo').value.trim();
-    const direccion = document.getElementById('direccion').value.trim();
-    const genero = document.getElementById('genero').value;
-    const colegiatura = document.getElementById('colegiatura').value.trim();
-    const rnp = document.getElementById('rnp').value.trim();
-    const profesion = document.getElementById('profesion').value;
-    const especialidad = document.getElementById('especialidad').value;
-    const fechaingresolaboral = document.getElementById('fechaingresolaboral').value || null; // Formato YYYY-MM-DD
-    const fechaterminolaboral = document.getElementById('fechaterminolaboral').value || null; // Null si está vacío
-    const activo = document.getElementById('activo').value;
-
-    // Validar campos requeridos
-    if (!dni || !nombre || !apellido || !fechanacimiento || !telefono || !correo || !direccion || !genero || !colegiatura || !rnp || !profesion || !especialidad || !fechaingresolaboral || !activo) {
-      alert('Por favor, complete todos los campos obligatorios.');
-      return;
-    }
-
-    // Formato del nuevo registro
-    const nuevoRegistro = {
-      dni,
-      nombre,
-      apellido,
-      fechanacimiento,
-      telefono,
-      correo,
-      direccion,
-      genero,
-      colegiatura,
-      rnp,
-      profesion,
-      especialidad,
-      fechaingresolaboral,
-      fechaterminolaboral, // Se envía como null si está vacío
-      activo,
-    };
-
-    // Realizar solicitud POST
-    fetch('http://localhost:3000/personal_cenate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(nuevoRegistro),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.message) {
-          alert(data.message);
-          clearForm(); // Limpiar el formulario después de guardar
-          hideAddForm(); // Ocultar formulario de registro
-        } else {
-          alert('Error al guardar el registro. Verifique los datos ingresados.');
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        alert('Hubo un error al enviar la solicitud. Intente nuevamente.');
-      });
-  }
-
-
-
-
-
-      function clearForm() {
-        document.getElementById('add-form-fields').reset();
-      }
-
-      function goBack() {
-        hideAddForm();
-      }
-      
-      function goToDirectory() {
-        window.location.href = 'personal_cenate.html'; // Cambia 'personal_cenate.html' al nombre de tu página de personal_cenate
-      }
-
-      
-
-        // Aquí va la lógica para obtener datos del backend o de una base de datos según el DNI ingresado
-        // Luego de obtener la información, se puede mostrar de manera dinámica en la página
-      
-
-        function fetchDataByDni() {
-  const dni = document.getElementById('search-dni').value;
-
-  if (dni === "") {
-    alert("Por favor ingresa un número de DNI.");
-    return;
-  }
-
-  // Realiza la solicitud al servidor
-  fetch(`http://localhost:3000/personal_cenate/${dni}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data) {
-      // Aquí puedes mostrar los datos en tu página
-      // Podrías actualizar el HTML con la información que se recibe
-      alert(`Datos encontrados: ${JSON.stringify(data)}`);
-    } else {
-      alert("No se encontró ningún registro.");
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert("Hubo un error al buscar los datos.");
-  });
-}
-
-    </script>
   </body>
 </html>

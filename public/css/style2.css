@@ -62,6 +62,31 @@ body {
   width: 160px;
 }
 
+
+.hidden {
+  display: none;
+}
+
+.required::after {
+  content: " *";
+  color: red;
+}
+
+.search-results {
+  margin-top: 20px;
+}
+
+.search-results table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.search-results th, .search-results td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
 .logo-left {
   left: 20px;
 }
