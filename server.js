@@ -120,6 +120,7 @@ app.get("/personal_cenate/:dni", async (req, res) => {
 });
 
 // Ruta POST para insertar un nuevo registro
+// Ruta POST para insertar un nuevo registro
 app.post("/personal_cenate", async (req, res) => {
   const {
     dni, nombre, apellido, fechanacimiento, telefono, correo, direccion,
@@ -127,20 +128,26 @@ app.post("/personal_cenate", async (req, res) => {
     fechaterminolaboral, activo,
   } = req.body;
 
+  // Imprimir los datos recibidos para depuración
+  console.log("Datos recibidos:", req.body);
+
   let connection;
   try {
     connection = await connectToDB();
+
+    // Consulta SQL para insertar el nuevo registro
     const query = `
-      INSERT INTO CENATE.CENATE_PERSONAL2025 (
+      INSERT INTO CENATE_PERSONAL2025 (
         DNI, NOMBRE, APELLIDO, FECHANACIMIENTO, TELEFONO, EMAIL, DIRECCION, GENERO,
         COLEGIATURA, RNP, PROFESION, ESPECIALIDAD, FECHAINGRESOLABORAL, FECHATERMINOLABORAL, ACTIVO
       ) VALUES (
-        :dni, :nombre, :apellido, TO_DATE(:fechanacimiento, 'YYYY-MM-DD'), :telefono, :correo, :direccion, :genero,
-        :colegiatura, :rnp, :profesion, :especialidad, TO_DATE(:fechaingresolaboral, 'YYYY-MM-DD'),
-        TO_DATE(:fechaterminolaboral, 'YYYY-MM-DD'), :activo
+        :dni, :nombre, :apellido, TO_DATE(:fechanacimiento, 'DD/MM/YYYY'), :telefono, :correo, :direccion, :genero,
+        :colegiatura, :rnp, :profesion, :especialidad, TO_DATE(:fechaingresolaboral, 'DD/MM/YYYY'),
+        TO_DATE(:fechaterminolaboral, 'DD/MM/YYYY'), :activo
       )
     `;
 
+    // Preparar los parámetros para la consulta
     const bindParams = {
       dni,
       nombre,
@@ -155,12 +162,14 @@ app.post("/personal_cenate", async (req, res) => {
       profesion,
       especialidad,
       fechaingresolaboral,
-      fechaterminolaboral: fechaterminolaboral || null,
+      fechaterminolaboral: fechaterminolaboral || null,  // Si fechaterminolaboral es null, Oracle lo manejará como NULL
       activo,
     };
 
-    await connection.execute(query, bindParams, { autoCommit: true });
+    // Ejecutar la consulta con los parámetros
+    const result = await connection.execute(query, bindParams, { autoCommit: true });
 
+    // Devolver respuesta si la inserción fue exitosa
     res.json({ message: "Registro guardado correctamente" });
   } catch (err) {
     console.error("Error al guardar el registro:", err);
@@ -174,6 +183,11 @@ app.post("/personal_cenate", async (req, res) => {
       }
     }
   }
+});
+
+// Iniciar el servidor
+app.listen(PORT, () => {
+  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
 
 // Ruta PUT para modificar un registro de personal
@@ -226,7 +240,13 @@ app.put("/personal_cenate/:dni", async (req, res) => {
       activo,
     };
 
-    await connection.execute(query, bindParams, { autoCommit: true });
+  // Ejecutar la consulta sin autoCommit
+  await connection.execute(query, bindParams);
+
+  // Realizar un commit explícito
+  await connection.commit();
+
+
 
     res.json({ message: "Registro modificado correctamente" });
   } catch (err) {

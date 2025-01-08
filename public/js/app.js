@@ -4,7 +4,7 @@ function showAddForm() {
     clearForm();  // Limpiar el formulario cuando se muestra
 }
 
-//Converti formato de fecha
+// Convertir formato de fecha
 function formatDate(dateStr) {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) {  // Verificar si es una fecha válida
@@ -15,8 +15,6 @@ function formatDate(dateStr) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
-
-
 
 // Función para guardar o actualizar los datos (POST o PUT dependiendo de si el DNI existe)
 async function savePerson() {
@@ -38,7 +36,7 @@ async function savePerson() {
         especialidad: document.getElementById('especialidad').value.trim(),
         fechaingresolaboral: formatDate(document.getElementById('fechaingresolaboral').value),
         fechaterminolaboral: document.getElementById('fechaterminolaboral').value.trim() || null,
-        activo: document.getElementById('activo').value.trim(),
+        activo: document.getElementById('activo').checked ? 'S' : 'N',  // Usar .checked para determinar si está activo
     };
 
     const method = dni ? 'PUT' : 'POST';
@@ -66,16 +64,6 @@ async function savePerson() {
     }
 }
 
-// Función para limpiar el formulario
-function clearForm() {
-    document.getElementById('add-form').reset();
-    document.getElementById('modify-delete-buttons').classList.add('hidden');
-    document.getElementById('search-dni').value = '';
-    document.getElementById('delete-button').classList.add('hidden');  // Ocultar el botón de eliminar
-    document.getElementById('save-button').textContent = 'Guardar Registro'; // Restablecer el texto del botón de guardar
-}
-
-// Función para mostrar los botones de modificar y eliminar
 // Función para mostrar los botones de modificar y eliminar
 function showModifyDeleteButtons() {
     const modifyDeleteButtons = document.getElementById('modify-delete-buttons');
@@ -129,11 +117,11 @@ function fetchDataByDni() {
                 document.getElementById('fechaterminolaboral').value = data.fechaterminolaboral || '';
                 document.getElementById('activo').checked = data.activo === 'S'; // Asegúrate de que el campo "activo" esté marcado si es 'S'
 
-               // Mostrar formulario
-        document.getElementById('add-form').classList.remove('hidden'); // Mostrar el formulario
+                // Mostrar formulario
+                document.getElementById('add-form').classList.remove('hidden'); // Mostrar el formulario
 
-        // Mostrar botones de modificar y eliminar
-        showModifyDeleteButtons();
+                // Mostrar botones de modificar y eliminar
+                showModifyDeleteButtons();
             } else {
                 alert("No se encontraron datos para el DNI proporcionado.");
             }
@@ -147,19 +135,7 @@ function fetchDataByDni() {
         });
 }
 
-
-
-
 // Ajustes al loader
-function showLoader(show) {
-    const loader = document.getElementById('loader');
-    if (loader) {
-        loader.style.display = show ? 'block' : 'none';
-    }
-}
-
-
-// Función para mostrar/ocultar un loader (puedes personalizarla)
 function showLoader(show) {
     const loader = document.getElementById('loader');
     if (loader) {
@@ -189,6 +165,38 @@ function deletePerson() {
         alert("Hubo un error al eliminar el registro.");
     });
 }
+
+// Función para limpiar el formulario
+function clearForm() {
+    // Si 'add-form' no es un formulario, hay que resetear los valores de los campos manualmente
+
+    document.getElementById('dni').value = '';
+    document.getElementById('nombre').value = '';
+    document.getElementById('apellido').value = '';
+    document.getElementById('fechanacimiento').value = '';
+    document.getElementById('telefono').value = '';
+    document.getElementById('correo').value = '';
+    document.getElementById('direccion').value = '';
+    document.getElementById('genero').value = '';
+    document.getElementById('colegiatura').value = '';
+    document.getElementById('rnp').value = '';
+    document.getElementById('profesion').value = '';
+    document.getElementById('especialidad').value = '';
+    document.getElementById('fechaingresolaboral').value = '';
+    document.getElementById('fechaterminolaboral').value = '';
+    document.getElementById('activo').checked = false; // Si tienes un checkbox, restablecer su valor
+
+    // Ocultar los botones de modificar y eliminar
+    document.getElementById('modify-delete-buttons').classList.add('hidden');
+    document.getElementById('delete-button').classList.add('hidden');  // Ocultar el botón de eliminar
+
+    // Limpiar el campo de búsqueda de DNI
+    document.getElementById('search-dni').value = '';
+
+    // Restablecer el texto del botón de guardar
+    document.getElementById('save-button').textContent = 'Guardar Registro';
+}
+
 
 // Función para regresar al directorio
 function goToDirectory() {
