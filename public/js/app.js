@@ -9,17 +9,16 @@ function formatDate(dateStr) {
     if (!dateStr) return null;  // Si la fecha está vacía, devolver null
 
     // Separar la fecha en día, mes y año
-    const [year, month, day] = dateStr.split('-');
+    const [day, month, year] = dateStr.split('/');
 
     // Verificar si la fecha es válida
     if (!year || !month || !day) {
         return null;
     }
 
-    // Devolver la fecha formateada como 'DD/MM/YYYY'
-    return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+    // Devolver la fecha formateada como 'YYYY-MM-DD'
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
-
 
 
 
@@ -41,7 +40,7 @@ async function savePerson() {
         dni,
         nombre: document.getElementById('nombre').value.trim(),
         apellido: document.getElementById('apellido').value.trim(),
-        fechanacimiento: document.getElementById('fechanacimiento').value,  // Directamente sin formateo
+        fechanacimiento: formatDate(document.getElementById('fechanacimiento').value),
         telefono: document.getElementById('telefono').value.trim(),
         correo: document.getElementById('correo').value.trim(),
         direccion: document.getElementById('direccion').value.trim(),
@@ -50,8 +49,8 @@ async function savePerson() {
         rnp: document.getElementById('rnp').value.trim(),
         profesion: document.getElementById('profesion').value.trim(),
         especialidad: document.getElementById('especialidad').value.trim(),
-        fechaingresolaboral: document.getElementById('fechaingresolaboral').value,  // Directamente sin formateo
-        fechaterminolaboral: document.getElementById('fechaterminolaboral').value || null,  // Si está vacío, enviar null
+        fechaingresolaboral: formatDate(document.getElementById('fechaingresolaboral').value),
+        fechaterminolaboral: formatDate(document.getElementById('fechaterminolaboral').value) || null,
         activo: document.getElementById('activo').checked ? 'S' : 'N',
     };
     
