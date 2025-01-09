@@ -47,32 +47,41 @@
         <h2>Agregar Nuevo Registro</h2>
         <form id="add-form-fields">
           <div class="row">
-            <div class="col-md-4">
-              <div class="mb-3">
-                <label for="dni" class="form-label required">DNI</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="dni"
-                  placeholder="Ingrese el número de DNI"
-                  pattern="^\d{8}$"
-                  maxlength="8"
-                  required
-                  oninput="validateDNI(this)" />
-              </div>
-            </div>
+           
+
+
+            <!-- Campo de entrada para el DNI -->
+<div class="col-md-4">
+  <div class="mb-3">
+      <label for="dni" class="form-label required">DNI</label>
+      <input
+          type="text"
+          class="form-control"
+          id="dni"
+          placeholder="Ingrese el número de DNI"
+          maxlength="8"
+          required
+          oninput="validateDNI(this)" />
+  </div>
+</div>
             
-            <script>
-              function validateDNI(input) {
-                const dni = input.value;
-                const regex = /^\d{8}$/;
-                if (dni && !regex.test(dni)) {
-                  input.setCustomValidity("El DNI debe tener 8 dígitos.");
-                } else {
-                  input.setCustomValidity("");
-                }
-              }
-            </script>
+
+<script>
+  function validateDNI(input) {
+      // Reemplaza cualquier carácter que no sea un número
+      input.value = input.value.replace(/\D/g, '');
+
+      // Verifica que el valor tenga exactamente 8 dígitos
+      const regex = /^\d{8}$/;
+      if (input.value && !regex.test(input.value)) {
+          input.setCustomValidity("El DNI debe tener 8 dígitos.");
+      } else {
+          input.setCustomValidity("");
+      }
+  }
+</script>
+
+
             <div class="col-md-4">
               <label for="nombre" class="required">Nombre:</label>
               <input type="text" id="nombre" class="form-control" required>
@@ -83,10 +92,11 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-4">
-              <label for="fechanacimiento" class="required">Fecha de Nacimiento:</label>
-              <input type="date" id="fechanacimiento" class="form-control" required>
-            </div>
+            <!-- Fecha de Nacimiento -->
+<div class="col-md-4">
+  <label for="fechanacimiento" class="required">Fecha de Nacimiento:</label>
+  <input type="date" id="fechanacimiento" class="form-control" required>
+</div>
             <div class="col-md-4">
               <div class="mb-3">
                 <label for="telefono" class="form-label required">Teléfono</label>
@@ -182,21 +192,27 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-4">
-              <label for="fechaingresolaboral" class="required">Fecha Ingreso Laboral:</label>
-              <input type="date" id="fechaingresolaboral" class="form-control" required>
-            </div>
-            <div class="col-md-4">
-              <label for="fechaterminolaboral">Fecha Terminación Laboral:</label>
-              <input type="date" id="fechaterminolaboral" class="form-control">
-            </div>
-            <div class="col-md-4">
-              <label for="activo" class="required">Activo:</label>
-              <select id="activo" class="form-control custom-select" required>
-                <option value="S" selected>Sí</option>
-                <option value="N">No</option>
-              </select>
-            </div>
+            
+<!-- Fecha Ingreso Laboral -->
+<div class="col-md-4">
+  <label for="fechaingresolaboral" class="required">Fecha Ingreso Laboral:</label>
+  <input type="date" id="fechaingresolaboral" class="form-control" required>
+</div>
+
+<!-- Fecha Terminación Laboral -->
+<div class="col-md-4">
+  <label for="fechaterminolaboral">Fecha Terminación Laboral:</label>
+  <input type="date" id="fechaterminolaboral" class="form-control">
+</div>
+
+           <!-- Activo -->
+<div class="col-md-4">
+  <label for="activo" class="required">Activo:</label>
+  <select id="activo" class="form-control custom-select" required>
+    <option value="S" selected>Sí</option>
+    <option value="N">No</option>
+  </select>
+</div>
           </div>
           <button type="button" id="save-button" class="btn" onclick="savePerson()">Guardar Registro</button>
           <button type="button" class="btn" onclick="clearForm()">Limpiar Formulario</button>

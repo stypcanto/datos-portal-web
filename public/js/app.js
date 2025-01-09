@@ -4,28 +4,44 @@ function showAddForm() {
     clearForm();  // Limpiar el formulario cuando se muestra
 }
 
-// Convertir formato de fecha
+// Función para formatear la fecha correctamente
 function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) {  // Verificar si es una fecha válida
-        return '';  // Retorna vacío si no es válida
+    if (!dateStr) return null;  // Si la fecha está vacía, devolver null
+
+    // Separar la fecha en día, mes y año
+    const [year, month, day] = dateStr.split('-');
+
+    // Verificar si la fecha es válida
+    if (!year || !month || !day) {
+        return null;
     }
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+
+    // Devolver la fecha formateada como 'DD/MM/YYYY'
+    return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
 }
+
+
+
+
+
+
 
 // Función para guardar o actualizar los datos (POST o PUT dependiendo de si el DNI existe)
 async function savePerson() {
     const dni = document.getElementById('dni').value.trim();
+
+    // Verifica si el DNI está vacío
+    if (!dni) {
+        alert("El DNI no puede estar vacío.");
+        return;
+    }
 
     // Crear el objeto con los datos a enviar
     const newData = {
         dni,
         nombre: document.getElementById('nombre').value.trim(),
         apellido: document.getElementById('apellido').value.trim(),
-        fechanacimiento: formatDate(document.getElementById('fechanacimiento').value),
+        fechanacimiento: document.getElementById('fechanacimiento').value,  // Directamente sin formateo
         telefono: document.getElementById('telefono').value.trim(),
         correo: document.getElementById('correo').value.trim(),
         direccion: document.getElementById('direccion').value.trim(),
@@ -34,16 +50,26 @@ async function savePerson() {
         rnp: document.getElementById('rnp').value.trim(),
         profesion: document.getElementById('profesion').value.trim(),
         especialidad: document.getElementById('especialidad').value.trim(),
-        fechaingresolaboral: formatDate(document.getElementById('fechaingresolaboral').value),
-        fechaterminolaboral: document.getElementById('fechaterminolaboral').value.trim() || null,
-        activo: document.getElementById('activo').checked ? 'S' : 'N',  // Usar .checked para determinar si está activo
+        fechaingresolaboral: document.getElementById('fechaingresolaboral').value,  // Directamente sin formateo
+        fechaterminolaboral: document.getElementById('fechaterminolaboral').value || null,  // Si está vacío, enviar null
+        activo: document.getElementById('activo').checked ? 'S' : 'N',
     };
+    
 
-    const method = dni ? 'PUT' : 'POST';
-    const url = dni ? `http://localhost:3000/personal_cenate/${dni}` : 'http://localhost:3000/personal_cenate';
+    let method = 'POST'; // Por defecto, intentamos crear un nuevo registro
+    const url = `http://localhost:3000/personal_cenate/${dni}`;
 
     try {
-        const response = await fetch(url, {
+        // Verificar si el DNI ya existe
+        const checkResponse = await fetch(url);
+        
+        // Si el DNI ya existe, usamos PUT para actualizar
+        if (checkResponse.ok) {
+            method = 'PUT'; // Forzar la actualización
+        }
+
+        // Enviar la solicitud con el método correcto
+        const response = await fetch(method === 'POST' ? 'http://localhost:3000/personal_cenate' : url, {
             method,
             headers: {
                 'Content-Type': 'application/json',
@@ -51,18 +77,26 @@ async function savePerson() {
             body: JSON.stringify(newData),
         });
 
-        if (!response.ok) {
-            throw new Error('Hubo un error al procesar la solicitud');
+        const data = await response.json();
+
+        // Verificar si hay un error en el servidor relacionado con el DNI
+        if (data.error) {
+            alert(data.error);
+            return;
         }
 
-        const data = await response.json();
-        alert(`${method === 'POST' ? 'Registro creado' : 'Registro modificado'} con éxito.`);
+        // Si la respuesta es exitosa, mostrar mensaje y limpiar el formulario
+        alert(`${method === 'POST' ? 'Registro creado' : 'Registro actualizado'} con éxito.`);
         clearForm();
     } catch (error) {
         console.error('Error:', error);
         alert('Hubo un error al guardar los datos.');
     }
 }
+
+
+
+
 
 // Función para mostrar los botones de modificar y eliminar
 function showModifyDeleteButtons() {
@@ -113,8 +147,9 @@ function fetchDataByDni() {
                 document.getElementById('rnp').value = data.rnp || '';
                 document.getElementById('profesion').value = data.profesion || '';
                 document.getElementById('especialidad').value = data.especialidad || '';
-                document.getElementById('fechaingresolaboral').value = formatDate(data.fechaingresolaboral) || '';
-                document.getElementById('fechaterminolaboral').value = data.fechaterminolaboral || '';
+                document.getElementById('fechaingresolaboral').value = formatDate(data.fechaingresolaboral || '') || '';
+document.getElementById('fechaterminolaboral').value = formatDate(data.fechaterminolaboral || '') || '';
+
                 document.getElementById('activo').checked = data.activo === 'S'; // Asegúrate de que el campo "activo" esté marcado si es 'S'
 
                 // Mostrar formulario

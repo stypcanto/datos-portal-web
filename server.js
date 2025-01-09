@@ -119,71 +119,117 @@ app.get("/personal_cenate/:dni", async (req, res) => {
   }
 });
 
-// Ruta POST para insertar un nuevo registro
+
 // Ruta POST para insertar un nuevo registro
 app.post("/personal_cenate", async (req, res) => {
-  const {
-    dni, nombre, apellido, fechanacimiento, telefono, correo, direccion,
-    genero, colegiatura, rnp, profesion, especialidad, fechaingresolaboral,
-    fechaterminolaboral, activo,
-  } = req.body;
+  const { fechaNacimiento, fechaIngresoLaboral, fechaTerminoLaboral } = req.body;
 
-  // Imprimir los datos recibidos para depuración
+
+// Función para formatear fechas al formato 'YYYY-MM-DD'
+function formatDate(dateStr) {
+  if (!dateStr) return null;  // Si la fecha está vacía, devolver null
+  const [year, month, day] = dateStr.split('-');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
+// Asegurarse de que las fechas estén en el formato correcto
+const formattedFechaNacimiento = formatDate(fechaNacimiento);
+const formattedFechaIngresoLaboral = formatDate(fechaIngresoLaboral);
+const formattedFechaTerminoLaboral = fechaTerminoLaboral ? formatDate(fechaTerminoLaboral) : null;
+
+
+// Realiza la operación de guardado en la base de datos
+
   console.log("Datos recibidos:", req.body);
+
+  function isValidDate(dateString) {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return regex.test(dateString);
+  }
 
   let connection;
   try {
     connection = await connectToDB();
+    console.log("Conexión a la base de datos establecida.");
 
-    // Consulta SQL para insertar el nuevo registro
-    const query = `
-      INSERT INTO CENATE_PERSONAL2025 (
-        DNI, NOMBRE, APELLIDO, FECHANACIMIENTO, TELEFONO, EMAIL, DIRECCION, GENERO,
-        COLEGIATURA, RNP, PROFESION, ESPECIALIDAD, FECHAINGRESOLABORAL, FECHATERMINOLABORAL, ACTIVO
-      ) VALUES (
-        :dni, :nombre, :apellido, TO_DATE(:fechanacimiento, 'DD/MM/YYYY'), :telefono, :correo, :direccion, :genero,
-        :colegiatura, :rnp, :profesion, :especialidad, TO_DATE(:fechaingresolaboral, 'DD/MM/YYYY'),
-        TO_DATE(:fechaterminolaboral, 'DD/MM/YYYY'), :activo
-      )
-    `;
+   // Validar fechas antes de insertar
+if (fechanacimiento && !isValidDate(fechanacimiento)) {
+  console.error("Fecha de nacimiento no válida:", fechanacimiento);
+  return res.status(400).json({ error: "Fecha de nacimiento no válida." });
+}
+if (fechaingresolaboral && !isValidDate(fechaingresolaboral)) {
+  console.error("Fecha de ingreso laboral no válida:", fechaingresolaboral);
+  return res.status(400).json({ error: "Fecha de ingreso laboral no válida." });
+}
 
-    // Preparar los parámetros para la consulta
-    const bindParams = {
-      dni,
-      nombre,
-      apellido,
-      fechanacimiento,
-      telefono,
-      correo,
-      direccion,
-      genero,
-      colegiatura,
-      rnp,
-      profesion,
-      especialidad,
-      fechaingresolaboral,
-      fechaterminolaboral: fechaterminolaboral || null,  // Si fechaterminolaboral es null, Oracle lo manejará como NULL
-      activo,
-    };
+   // Verificar si el DNI ya existe en la base de datos
+const checkQuery = `
+SELECT COUNT(*) FROM CENATE_PERSONAL2025 WHERE DNI = :dni
+`;
+const checkResult = await connection.execute(checkQuery, { dni });
 
-    // Ejecutar la consulta con los parámetros
-    const result = await connection.execute(query, bindParams, { autoCommit: true });
+if (checkResult.rows[0][0] > 0) {
+console.error("El DNI ya existe en la base de datos.");
+return res.status(400).json({ error: "El DNI ya fue registrado, ingrese otro por favor." });
+}
 
-    // Devolver respuesta si la inserción fue exitosa
-    res.json({ message: "Registro guardado correctamente" });
+   // Consulta SQL para insertar el nuevo registro
+   const query = `
+   INSERT INTO CENATE_PERSONAL2025 (
+     DNI, NOMBRE, APELLIDO, FECHANACIMIENTO, TELEFONO, EMAIL, DIRECCION, GENERO,
+     COLEGIATURA, RNP, PROFESION, ESPECIALIDAD, FECHAINGRESOLABORAL, FECHATERMINOLABORAL, ACTIVO
+   ) VALUES (
+     :dni, :nombre, :apellido, TO_DATE(:fechanacimiento, 'YYYY-MM-DD'), :telefono, :correo, :direccion, :genero,
+     :colegiatura, :rnp, :profesion, :especialidad, TO_DATE(:fechaingresolaboral, 'YYYY-MM-DD'),
+     TO_DATE(:fechaterminolaboral, 'YYYY-MM-DD'), :activo
+   )
+ `;
+
+ const bindParams = {
+  dni,
+  nombre,
+  apellido,
+  fechanacimiento: formattedFechaNacimiento || null,
+  telefono,
+  correo,
+  direccion,
+  genero,
+  colegiatura,
+  rnp,
+  profesion,
+  especialidad,
+  fechaingresolaboral: formattedFechaIngresoLaboral || null,
+  fechaterminolaboral: formattedFechaTerminoLaboral || null,
+  activo,
+};
+
+  
+  console.log("Parámetros de fecha:", bindParams.fechanacimiento, bindParams.fechaingresolaboral, bindParams.fechaterminolaboral);
+
+console.log("Parámetros para la consulta:", bindParams);
+
+const result = await connection.execute(query, bindParams, { autoCommit: true });
+
+res.json({ message: "Registro nuevo creado correctamente" });
+
+
   } catch (err) {
     console.error("Error al guardar el registro:", err);
-    res.status(500).json({ error: "Hubo un error al guardar el registro" });
+    res.status(500).json({ error: "Hubo un error al guardar el registro", details: err });
   } finally {
     if (connection) {
       try {
         await connection.close();
       } catch (err) {
         console.error("Error al cerrar la conexión:", err);
+        res.status(500).json({ error: "Hubo un error al guardar el registro", details: err });
       }
     }
   }
 });
+
+
+
 
 
 
@@ -243,7 +289,7 @@ app.put("/personal_cenate/:dni", async (req, res) => {
   // Realizar un commit explícito
   await connection.commit();
 
-
+  
 
     res.json({ message: "Registro modificado correctamente" });
   } catch (err) {
