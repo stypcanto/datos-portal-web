@@ -185,10 +185,7 @@ app.post("/personal_cenate", async (req, res) => {
   }
 });
 
-// Iniciar el servidor
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
-});
+
 
 // Ruta PUT para modificar un registro de personal
 app.put("/personal_cenate/:dni", async (req, res) => {
